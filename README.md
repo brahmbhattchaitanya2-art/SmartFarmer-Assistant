@@ -78,10 +78,10 @@ python manage.py migrate
 
 ### 5. Start the Development Server
 ```bash
-python manage.py runserver
+python manage.py runserver 8001
 ```
 
-Open [http://127.0.0.1:8000/](http://127.0.0.1:8000/) in your browser.
+Open [http://127.0.0.1:8001/](http://127.0.0.1:8001/) in your browser.
 
 ---
 
