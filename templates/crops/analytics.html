@@ -1,0 +1,198 @@
+{% extends 'core/dashboard_base.html' %}
+{% block title %}Smart Farmer Assistant - Crop Analytics{% endblock %}
+
+{% block dashboard_content %}
+<!-- Load Plotly library CDN once -->
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+<div class="fade-in-up">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">📊 Crop Analytics Dashboard</h2>
+            <p class="text-muted mb-0">Interactive crop distribution, investment timelines, and performance insights (Sabarkantha, Gujarat).</p>
+        </div>
+        <div>
+            <a href="{% url 'crops:crop_add' %}" class="btn btn-premium btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Add Sown Crop
+            </a>
+        </div>
+    </div>
+
+    {% if empty_state %}
+    <!-- Empty State -->
+    <div class="text-center py-5 bg-white border rounded-4 shadow-sm my-4">
+        <div class="card-icon-container mx-auto mb-3 bg-light text-muted">
+            <i class="bi bi-bar-chart-line fs-1"></i>
+        </div>
+        <h5>No crop data available.</h5>
+        <p class="text-muted small">Analytics requires crop records. Please register your active crop cultivations first.</p>
+        <a href="{% url 'crops:crop_add' %}" class="btn btn-premium px-4 py-2 mt-2">Record Crop Cultivation</a>
+    </div>
+    {% else %}
+    
+    <!-- Top Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="p-3 bg-white border rounded-4 d-flex align-items-center gap-3 shadow-sm">
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                    <i class="bi bi-collection-fill fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted d-block small">Total Crops Sown</span>
+                    <h5 class="fw-bold mb-0 text-dark">{{ stats.total_crops }} Records</h5>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="p-3 bg-white border rounded-4 d-flex align-items-center gap-3 shadow-sm">
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                    <i class="bi bi-aspect-ratio fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted d-block small">Total Area Sown</span>
+                    <h5 class="fw-bold mb-0 text-dark">{{ stats.total_land|stringformat:".2f" }} Acres</h5>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="p-3 bg-white border rounded-4 d-flex align-items-center gap-3 shadow-sm">
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                    <i class="bi bi-wallet2 fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted d-block small">Total Sunk Cost</span>
+                    <h5 class="fw-bold mb-0 text-dark">₹ {{ stats.total_investment|stringformat:".2f" }}</h5>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="p-3 bg-white border rounded-4 d-flex align-items-center gap-3 shadow-sm">
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                    <i class="bi bi-graph-up-arrow fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted d-block small">Expected Revenue</span>
+                    <h5 class="fw-bold mb-0 text-success">₹ {{ stats.total_revenue|stringformat:".2f" }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Insights & DataFrame Averages Table Row -->
+    <div class="row g-4 mb-4">
+        <!-- Top Performing Crop Cards -->
+        <div class="col-md-6">
+            <div class="p-4 rounded-4 bg-white border shadow-sm h-100">
+                <h5 class="fw-bold text-success mb-3"><i class="bi bi-star-fill me-2"></i>Performance Leaders</h5>
+                
+                <div class="mb-3 p-3 bg-light rounded-3 border">
+                    <span class="text-muted d-block small">Highest Revenue Crop</span>
+                    <h6 class="fw-bold text-success mb-1">{{ highest_revenue.name }} ({{ highest_revenue.variety }})</h6>
+                    <span class="fw-bold text-dark fs-5">₹ {{ highest_revenue.revenue|stringformat:".2f" }}</span>
+                </div>
+                
+                <div class="p-3 bg-light rounded-3 border">
+                    <span class="text-muted d-block small">Highest Yield Crop</span>
+                    <h6 class="fw-bold text-success mb-1">{{ highest_yield.name }} ({{ highest_yield.variety }})</h6>
+                    <span class="fw-bold text-dark fs-5">{{ highest_yield.yield|stringformat:".2f" }} Quintals</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pandas Statistical Calculation Table -->
+        <div class="col-md-6">
+            <div class="p-4 rounded-4 bg-white border shadow-sm h-100">
+                <h5 class="fw-bold text-success mb-3"><i class="bi bi-calculator me-2"></i>Statistical Summary (Pandas)</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle table-sm border-0 mb-0" style="font-size: 0.9rem;">
+                        <thead>
+                            <tr class="text-muted border-bottom">
+                                <th>Metric</th>
+                                <th>Total</th>
+                                <th>Average</th>
+                                <th>Minimum</th>
+                                <th>Maximum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-bottom">
+                                <td class="fw-semibold">Land Size (Acres)</td>
+                                <td>{{ stats.total_land|stringformat:".1f" }}</td>
+                                <td>{{ stats.avg_land|stringformat:".1f" }}</td>
+                                <td>{{ stats.min_land|stringformat:".1f" }}</td>
+                                <td>{{ stats.max_land|stringformat:".1f" }}</td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td class="fw-semibold">Investment (₹)</td>
+                                <td>{{ stats.total_investment|floatformat:0 }}</td>
+                                <td>{{ stats.avg_investment|floatformat:0 }}</td>
+                                <td>{{ stats.min_investment|floatformat:0 }}</td>
+                                <td>{{ stats.max_investment|floatformat:0 }}</td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td class="fw-semibold">Yield (Quintals)</td>
+                                <td>{{ stats.total_yield|stringformat:".1f" }}</td>
+                                <td>{{ stats.avg_yield|stringformat:".1f" }}</td>
+                                <td>{{ stats.min_yield|stringformat:".1f" }}</td>
+                                <td>{{ stats.max_yield|stringformat:".1f" }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold">Revenue (₹)</td>
+                                <td>{{ stats.total_revenue|floatformat:0 }}</td>
+                                <td>{{ stats.avg_revenue|floatformat:0 }}</td>
+                                <td>{{ stats.min_revenue|floatformat:0 }}</td>
+                                <td>{{ stats.max_revenue|floatformat:0 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline Chart Full Width Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                {{ chart_timeline|safe }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Land Distribution & Sowing Status -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                {{ chart_land|safe }}
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                {{ chart_status|safe }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3: Investment & Revenue by Crop -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                {{ chart_inv|safe }}
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                {{ chart_rev|safe }}
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+{% endblock %}

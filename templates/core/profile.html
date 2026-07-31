@@ -1,0 +1,149 @@
+{% extends 'core/dashboard_base.html' %}
+{% block title %}Smart Farmer Assistant - Profile Settings{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0"><i class="bi bi-person-fill-gear text-success me-2"></i>Profile Settings</h2>
+            <p class="text-muted mb-0">Manage your farm parameters, contact details, and location configurations.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Profile Summary Card -->
+        <div class="col-xl-4">
+            <div class="premium-card p-4 shadow-sm border bg-white text-center">
+                <div class="card-icon-container mx-auto">
+                    <i class="bi bi-person-bounding-box text-success"></i>
+                </div>
+                <h4 class="fw-bold mt-3 mb-1">{{ request.user.first_name }} {{ request.user.last_name }}</h4>
+                <span class="badge bg-success bg-opacity-15 text-success px-3 py-1 mb-4">Farmer Member</span>
+                
+                <hr class="my-3">
+                
+                <div class="text-start">
+                    <div class="mb-3">
+                        <span class="text-muted d-block small">Username</span>
+                        <span class="fw-semibold text-dark">{{ request.user.username }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-muted d-block small">Email Address</span>
+                        <span class="fw-semibold text-dark">{{ request.user.email }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-muted d-block small">Mobile Number</span>
+                        <span class="fw-semibold text-dark">+91 {{ profile.phone_number }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-muted d-block small">Farming Location</span>
+                        <span class="fw-semibold text-dark">{{ profile.village }} Village, {{ profile.district }} District, {{ profile.get_state_display }}</span>
+                    </div>
+                    <div class="mb-0">
+                        <span class="text-muted d-block small">Cultivated Land</span>
+                        <span class="fw-semibold text-dark">{{ profile.land_size }} Acres (Primary: {{ profile.primary_crop }})</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Edit Profile Form -->
+        <div class="col-xl-8">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                <h4 class="fw-bold mb-4 text-dark">Update Details</h4>
+                
+                <form method="POST" action="{% url 'profile' %}">
+                    {% csrf_token %}
+                    
+                    <h6 class="fw-bold text-success border-bottom pb-2 mb-3">Account details</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ user_form.first_name.id_for_label }}" class="form-label fw-semibold">First Name</label>
+                            <input type="text" name="first_name" id="{{ user_form.first_name.id_for_label }}" class="form-control form-control-custom {% if user_form.first_name.errors %}is-invalid{% endif %}" value="{{ user_form.first_name.value }}" required>
+                            {% for error in user_form.first_name.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ user_form.last_name.id_for_label }}" class="form-label fw-semibold">Last Name</label>
+                            <input type="text" name="last_name" id="{{ user_form.last_name.id_for_label }}" class="form-control form-control-custom {% if user_form.last_name.errors %}is-invalid{% endif %}" value="{{ user_form.last_name.value }}" required>
+                            {% for error in user_form.last_name.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <label for="{{ user_form.email.id_for_label }}" class="form-label fw-semibold">Email Address</label>
+                            <input type="email" name="email" id="{{ user_form.email.id_for_label }}" class="form-control form-control-custom {% if user_form.email.errors %}is-invalid{% endif %}" value="{{ user_form.email.value }}" required>
+                            {% for error in user_form.email.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <h6 class="fw-bold text-success border-bottom pb-2 mb-3 mt-4">Land & Location Details</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ profile_form.phone_number.id_for_label }}" class="form-label fw-semibold">Mobile Number</label>
+                            <input type="text" name="phone_number" id="{{ profile_form.phone_number.id_for_label }}" class="form-control form-control-custom {% if profile_form.phone_number.errors %}is-invalid{% endif %}" value="{{ profile_form.phone_number.value }}" required>
+                            {% for error in profile_form.phone_number.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ profile_form.primary_crop.id_for_label }}" class="form-label fw-semibold">Primary Crop</label>
+                            <input type="text" name="primary_crop" id="{{ profile_form.primary_crop.id_for_label }}" class="form-control form-control-custom {% if profile_form.primary_crop.errors %}is-invalid{% endif %}" value="{{ profile_form.primary_crop.value }}" required>
+                            {% for error in profile_form.primary_crop.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ profile_form.village.id_for_label }}" class="form-label fw-semibold">Village</label>
+                            <input type="text" name="village" id="{{ profile_form.village.id_for_label }}" class="form-control form-control-custom {% if profile_form.village.errors %}is-invalid{% endif %}" value="{{ profile_form.village.value }}" required>
+                            {% for error in profile_form.village.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="{{ profile_form.district.id_for_label }}" class="form-label fw-semibold">District</label>
+                            <input type="text" name="district" id="{{ profile_form.district.id_for_label }}" class="form-control form-control-custom {% if profile_form.district.errors %}is-invalid{% endif %}" value="{{ profile_form.district.value }}" required>
+                            {% for error in profile_form.district.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="{{ profile_form.state.id_for_label }}" class="form-label fw-semibold">State</label>
+                            <select name="state" id="{{ profile_form.state.id_for_label }}" class="form-select form-control-custom {% if profile_form.state.errors %}is-invalid{% endif %}" required>
+                                {% for choice in profile_form.fields.state.choices %}
+                                <option value="{{ choice.0 }}" {% if profile_form.state.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                            </select>
+                            {% for error in profile_form.state.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ profile_form.land_size.id_for_label }}" class="form-label fw-semibold">Land Size (Acres)</label>
+                            <input type="number" name="land_size" step="0.01" id="{{ profile_form.land_size.id_for_label }}" class="form-control form-control-custom {% if profile_form.land_size.errors %}is-invalid{% endif %}" value="{{ profile_form.land_size.value }}" required>
+                            {% for error in profile_form.land_size.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-premium w-100 py-3">Save Profile Changes <i class="bi bi-save-fill ms-2"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

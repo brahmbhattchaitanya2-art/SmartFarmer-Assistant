@@ -1,0 +1,281 @@
+{% extends 'core/dashboard_base.html' %}
+{% block title %}Smart Farmer Assistant - Dashboard{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <!-- Dashboard Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">Welcome, {{ request.user.first_name }}!</h2>
+            <p class="text-muted mb-0">Location: {{ profile.village }} Village, {{ profile.district }} District, {{ profile.get_state_display }}</p>
+        </div>
+        <div class="text-lg-end">
+            <span class="badge bg-success bg-opacity-15 text-success fs-6 py-2 px-3 fw-semibold">
+                <i class="bi bi-calendar3 me-2"></i>Date: {{ today_date }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Quick Overview Stats -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="p-3 bg-white border rounded-4 d-flex align-items-center gap-3 shadow-sm">
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                    <i class="bi bi-aspect-ratio fs-3"></i>
+                </div>
+                <div>
+                    <span class="text-muted d-block small">Cultivated Land</span>
+                    <h5 class="fw-bold mb-0 text-dark">{{ total_land|default:"0.00" }} Acres</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 bg-white border rounded-4 d-flex align-items-center gap-3 shadow-sm">
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                    <i class="bi bi-wallet2 fs-3"></i>
+                </div>
+                <div>
+                    <span class="text-muted d-block small">Total Sunk Investment</span>
+                    <h5 class="fw-bold mb-0 text-dark">₹ {{ total_investment|default:"0.00" }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 bg-white border rounded-4 d-flex align-items-center gap-3 shadow-sm">
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                    <i class="bi bi-graph-up-arrow fs-3"></i>
+                </div>
+                <div>
+                    <span class="text-muted d-block small">Estimated Income</span>
+                    <h5 class="fw-bold mb-0 text-success">₹ {{ expected_revenue|default:"0.00" }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sown Crops Overview -->
+    <div class="row g-4 mb-5">
+        <div class="col-12">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                    <h4 class="fw-bold mb-0">Active Sown Crops (Sabarkantha, Gujarat)</h4>
+                    <a href="{% url 'crops:crop_add' %}" class="btn btn-premium btn-sm"><i class="bi bi-plus-circle me-1"></i> Add New Crop</a>
+                </div>
+
+                {% if recent_crops %}
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Crop Name</th>
+                                <th>Variety</th>
+                                <th>Sowing Date</th>
+                                <th>Expected Harvest</th>
+                                <th>Acreage</th>
+                                <th>Investment</th>
+                                <th>Estimated Income</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for crop in recent_crops %}
+                            <tr>
+                                <td>
+                                    <span class="fw-bold text-success">{{ crop.get_name_display }}</span>
+                                </td>
+                                <td><span class="badge bg-light text-dark">{{ crop.variety }}</span></td>
+                                <td>{{ crop.sowing_date|date:"d/m/Y" }}</td>
+                                <td>{{ crop.expected_harvest_date|date:"d/m/Y" }}</td>
+                                <td>{{ crop.land_size }} Acres</td>
+                                <td>₹ {{ crop.investment_cost }}</td>
+                                <td class="fw-bold text-success">₹ {{ crop.estimated_revenue }}</td>
+                                <td>
+                                    <div class="d-flex flex-column gap-1" style="min-width: 150px;">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="small fw-semibold text-{{ crop.progress_data.color }}">{{ crop.get_status_display }}</span>
+                                            <span class="small text-muted">{{ crop.progress_data.percent }}%</span>
+                                        </div>
+                                        <div class="progress" style="height: 6px; border-radius: 3px;">
+                                            <div class="progress-bar bg-{{ crop.progress_data.color }}" role="progressbar" style="width: {{ crop.progress_data.percent }}%;" aria-valuenow="{{ crop.progress_data.percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="{% url 'crops:crop_detail' crop.pk %}" class="btn btn-sm btn-outline-success"><i class="bi bi-eye"></i></a>
+                                        <a href="{% url 'crops:crop_update' crop.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="card-icon-container mx-auto mb-3 bg-light text-muted">
+                        <i class="bi bi-flower1 fs-1"></i>
+                    </div>
+                    <h5>No Crops Recorded Yet</h5>
+                    <p class="text-muted small">Record your cotton, groundnut, or castor cultivations to monitor investments, tasks, and market yields.</p>
+                    <a href="{% url 'crops:crop_add' %}" class="btn btn-premium px-4 py-2 mt-2">Add Your First Crop</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Disease Predictions Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-12">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                    <h4 class="fw-bold mb-0">Recent Crop Disease Classifier Audits</h4>
+                    <a href="{% url 'crops:disease_prediction' %}" class="btn btn-premium btn-sm"><i class="bi bi-cpu me-1"></i> New Classifier Query</a>
+                </div>
+
+                {% if recent_predictions %}
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date/Time</th>
+                                <th>Crop Sown</th>
+                                <th>Classifier Used</th>
+                                <th>Climate Input (Temp/Hum/Rain)</th>
+                                <th>Predicted Diagnosis</th>
+                                <th>Confidence</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in recent_predictions %}
+                            <tr>
+                                <td class="small text-muted">{{ record.created_at|date:"d/m/Y H:i" }}</td>
+                                <td class="fw-bold text-success">{{ record.get_crop_name_display }}</td>
+                                <td><span class="badge bg-light text-dark">{{ record.ml_model }}</span></td>
+                                <td class="small">
+                                    <span class="badge bg-light text-dark">{{ record.temperature }}°C</span>
+                                    <span class="badge bg-light text-dark">{{ record.humidity }}%</span>
+                                    <span class="badge bg-light text-dark">{{ record.rainfall }}mm</span>
+                                </td>
+                                <td class="fw-bold {% if record.disease == 'Healthy' %}text-success{% else %}text-danger{% endif %}">
+                                    {{ record.disease }}
+                                </td>
+                                <td class="fw-bold text-success">{{ record.confidence }}%</td>
+                                <td class="text-end">
+                                    <a href="{% url 'crops:disease_prediction' %}" class="btn btn-sm btn-outline-success"><i class="bi bi-arrow-repeat me-1"></i>Re-diagnose</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-cpu fs-2 mb-2"></i>
+                    <p class="mb-0 small">No disease predictions recorded yet. Run a prediction to check crop leaves parameters.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <h4 class="fw-bold mb-4">Quick Navigation Modules</h4>
+
+    <!-- Grid of Clickable Actions -->
+    <div class="row g-4">
+        <!-- Card 1: My Crops -->
+        <div class="col-md-6 col-xl-4">
+            <a href="{% url 'crops:my_crops' %}" class="text-decoration-none text-dark d-block h-100">
+                <div class="premium-card h-100">
+                    <div class="card-icon-container">
+                        <i class="bi bi-calendar4-range text-success"></i>
+                    </div>
+                    <h5 class="fw-bold">🌾 My Crops</h5>
+                    <p class="text-muted small mb-0">Track active cultivation stages, seasonal investments, and expected yields for your sown fields.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card 2: Crop Library -->
+        <div class="col-md-6 col-xl-4">
+            <a href="{% url 'crop_library' %}" class="text-decoration-none text-dark d-block h-100">
+                <div class="premium-card h-100">
+                    <div class="card-icon-container">
+                        <i class="bi bi-flower1 text-success"></i>
+                    </div>
+                    <h5 class="fw-bold">🌱 Crop Library</h5>
+                    <p class="text-muted small mb-0">Browse details for seasonal Indian crops, ideal sowing parameters, and government MSP pricing.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card 3: Weather Updates -->
+        <div class="col-md-6 col-xl-4">
+            <a href="{% url 'weather_updates' %}" class="text-decoration-none text-dark d-block h-100">
+                <div class="premium-card h-100">
+                    <div class="card-icon-container">
+                        <i class="bi bi-cloud-sun text-success"></i>
+                    </div>
+                    <h5 class="fw-bold">🌦️ Weather Updates</h5>
+                    <p class="text-muted small mb-0">Access real-time local forecasts, monsoon calendars, and climate alerts customized for farmers.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card 4: Market Prices -->
+        <div class="col-md-6 col-xl-4">
+            <a href="{% url 'market_prices' %}" class="text-decoration-none text-dark d-block h-100">
+                <div class="premium-card h-100">
+                    <div class="card-icon-container">
+                        <i class="bi bi-currency-rupee text-success"></i>
+                    </div>
+                    <h5 class="fw-bold">💰 Market Prices</h5>
+                    <p class="text-muted small mb-0">Check live rates from local APMC Mandis (Mandi Bhav) across India in Rupees per Quintal.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card 5: Disease Prediction -->
+        <div class="col-md-6 col-xl-4">
+            <a href="{% url 'disease_prediction' %}" class="text-decoration-none text-dark d-block h-100">
+                <div class="premium-card h-100">
+                    <div class="card-icon-container">
+                        <i class="bi bi-virus text-success"></i>
+                    </div>
+                    <h5 class="fw-bold">🦠 Disease Prediction</h5>
+                    <p class="text-muted small mb-0">Upload leaves snapshots to immediately classify plant diseases and find organic remedies.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card 6: Fertilizer Recommendation -->
+        <div class="col-md-6 col-xl-4">
+            <a href="{% url 'fertilizer_guide' %}" class="text-decoration-none text-dark d-block h-100">
+                <div class="premium-card h-100">
+                    <div class="card-icon-container">
+                        <i class="bi bi-droplet text-success"></i>
+                    </div>
+                    <h5 class="fw-bold">🧪 Fertilizer Guide</h5>
+                    <p class="text-muted small mb-0">Get N-P-K recommendation guides based on soil parameters to maximize yields.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card 7: Farming News -->
+        <div class="col-md-6 col-xl-4">
+            <a href="{% url 'farming_news' %}" class="text-decoration-none text-dark d-block h-100">
+                <div class="premium-card h-100">
+                    <div class="card-icon-container">
+                        <i class="bi bi-newspaper text-success"></i>
+                    </div>
+                    <h5 class="fw-bold">📰 Agriculture News</h5>
+                    <p class="text-muted small mb-0">Stay informed with updates on central scheme subsidies, technology trends, and rules.</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

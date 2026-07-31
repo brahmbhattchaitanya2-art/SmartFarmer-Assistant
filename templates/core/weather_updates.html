@@ -1,0 +1,184 @@
+{% extends 'core/dashboard_base.html' %}
+{% block title %}Smart Farmer Assistant - Weather Updates{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <!-- Header with Search -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">🌦️ Weather Updates & Advisories</h2>
+            <p class="text-muted mb-0">Real-time forecasts and localized crop protection advice (Sabarkantha, Gujarat).</p>
+        </div>
+        
+        <!-- Search bar -->
+        <form method="GET" action="" class="d-flex gap-2" style="max-width: 400px; width: 100%;">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Search Taluka/City (e.g. Rajkot, Deesa)" value="{{ search_query }}">
+            </div>
+            <button type="submit" class="btn btn-premium">Search</button>
+        </form>
+    </div>
+
+    <!-- Active Weather Dashboard Card -->
+    <div class="row g-4 mb-4">
+        <!-- Left: Current Conditions -->
+        <div class="col-lg-6">
+            <div class="premium-card p-4 p-md-5 bg-gradient bg-{{ weather.theme }} text-white border-0 shadow-lg h-100 position-relative overflow-hidden" style="border-radius: 24px; min-height: 280px;">
+                <!-- Decorative background elements -->
+                <div class="position-absolute end-0 bottom-0 opacity-10" style="transform: translate(20%, 20%); font-size: 15rem; line-height: 1;">
+                    <i class="bi {{ weather.icon }}"></i>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-start position-relative">
+                    <div>
+                        <span class="badge bg-white bg-opacity-25 text-white mb-2 fs-6 px-3 py-1 rounded-pill"><i class="bi bi-geo-alt-fill me-1"></i>{{ weather.location }}</span>
+                        <h4 class="fw-bold mb-1">Today's Crop Weather</h4>
+                        <span class="fs-6 opacity-75">{{ weather.condition }}</span>
+                    </div>
+                    <div style="font-size: 3.5rem;">
+                        <i class="bi {{ weather.icon }}"></i>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 position-relative">
+                    <div class="d-flex align-items-baseline">
+                        <span class="display-3 fw-bold">{{ weather.temperature }}</span>
+                        <span class="fs-1 fw-semibold">°C</span>
+                    </div>
+                </div>
+
+                <!-- Climate parameters -->
+                <div class="row g-3 mt-4 pt-3 border-top border-white border-opacity-15 position-relative">
+                    <div class="col-4 border-end border-white border-opacity-15">
+                        <span class="d-block small opacity-75">Relative Humidity</span>
+                        <span class="fw-bold fs-5"><i class="bi bi-droplet-fill me-1"></i>{{ weather.humidity }}%</span>
+                    </div>
+                    <div class="col-4 border-end border-white border-opacity-15">
+                        <span class="d-block small opacity-75">Precipitation</span>
+                        <span class="fw-bold fs-5"><i class="bi bi-cloud-rain-heavy-fill me-1"></i>{{ weather.rainfall }} mm</span>
+                    </div>
+                    <div class="col-4">
+                        <span class="d-block small opacity-75">Wind Speed</span>
+                        <span class="fw-bold fs-5"><i class="bi bi-wind me-1"></i>{{ weather.wind_speed }} km/h</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Smart Agriculture Alerts -->
+        <div class="col-lg-6">
+            <div class="p-4 p-md-5 rounded-4 bg-white border shadow-sm h-100">
+                <h4 class="fw-bold text-dark mb-4"><i class="bi bi-bell-fill text-success me-2"></i>Smart Farming Alerts</h4>
+                <div class="d-flex flex-column gap-3">
+                    {% for alert in weather.alerts %}
+                    <div class="alert alert-{{ alert.level }} border-0 d-flex gap-3 mb-0 p-3 shadow-sm align-items-start" style="border-radius: 16px;">
+                        <div class="bg-{{ alert.level }} bg-opacity-10 text-{{ alert.level }} p-2 rounded-3 fs-4" style="line-height: 1;">
+                            <i class="bi {{ alert.icon }}"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1 text-{{ alert.level }}-emphasis">{{ alert.title }}</h6>
+                            <p class="small mb-0 text-muted" style="line-height: 1.5;">{{ alert.description }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7-Day Forecast Grid Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-12">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                <h4 class="fw-bold mb-4 text-dark"><i class="bi bi-calendar-week me-2 text-success"></i>7-Day Weather Outlook</h4>
+                <div class="row row-cols-2 row-cols-md-4 row-cols-lg-7 g-3">
+                    {% for day in weather.forecast %}
+                    <div class="col">
+                        <div class="p-3 bg-light rounded-4 border text-center h-100 d-flex flex-column justify-content-between hover-card">
+                            <span class="small text-muted fw-bold">{{ day.date }}</span>
+                            <div class="my-3 text-success" style="font-size: 2.2rem;">
+                                <i class="bi {{ day.icon }}"></i>
+                            </div>
+                            <div>
+                                <span class="d-block fw-bold text-dark fs-5">{{ day.temp_max }}°</span>
+                                <span class="d-block text-muted small">{{ day.temp_min }}°</span>
+                            </div>
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary-emphasis small mt-2 py-1">{{ day.condition }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Crop-wise Agricultural Advisories (Gujarat) -->
+    <div class="row g-4 mb-5">
+        <div class="col-12">
+            <div class="p-4 p-md-5 rounded-4 bg-white border shadow-sm">
+                <h4 class="fw-bold mb-4 text-dark"><i class="bi bi-journal-check me-2 text-success"></i>Crop-wise Advisory (Sabarkantha Region)</h4>
+                <p class="text-muted small mb-4">Advisory guidelines computed for major crops cultivated in Himmatnagar block based on the current weather models.</p>
+                
+                <div class="row g-3">
+                    {% for crop, advice in weather.advisories.items %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="p-3 bg-light rounded-3 border h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <h6 class="fw-bold text-success mb-2"><i class="bi bi-patch-check-fill me-1"></i>{{ crop }}</h6>
+                                <p class="text-muted small mb-0" style="line-height: 1.6;">{{ advice }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Query history logs -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                <h4 class="fw-bold mb-4"><i class="bi bi-clock-history me-2 text-success"></i>Weather History Logs (SQLite)</h4>
+                
+                {% if history %}
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Searched At</th>
+                                <th>Location Query</th>
+                                <th>Temperature</th>
+                                <th>Relative Humidity</th>
+                                <th>Precipitation</th>
+                                <th>Wind Speed</th>
+                                <th>Status Condition</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in history %}
+                            <tr>
+                                <td class="small text-muted">{{ record.searched_at|date:"d/m/Y H:i" }}</td>
+                                <td class="fw-bold text-success">{{ record.query_location }}</td>
+                                <td class="fw-bold">{{ record.temperature }}°C</td>
+                                <td>{{ record.humidity }}%</td>
+                                <td>{{ record.rainfall }} mm</td>
+                                <td>{{ record.wind_speed }} km/h</td>
+                                <td><span class="badge bg-secondary bg-opacity-10 text-secondary-emphasis">{{ record.condition }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-database-exclamation fs-1 mb-2"></i>
+                    <p class="mb-0 small">No weather history logs found in SQLite.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

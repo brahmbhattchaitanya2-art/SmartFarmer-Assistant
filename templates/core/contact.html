@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Smart Farmer Assistant - Contact{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="py-5 bg-success bg-opacity-10">
+    <div class="container text-center">
+        <span class="text-success fw-bold text-uppercase">Connect With Us</span>
+        <h1 class="display-4 fw-bold mt-2">Get in Touch</h1>
+        <p class="lead text-muted mx-auto" style="max-width: 600px;">Have questions or need assistance? We are here to help you optimize your farm.</p>
+    </div>
+</section>
+
+<!-- Contact Info & Form -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="row g-5">
+            <!-- Left Side: Contact Information -->
+            <div class="col-lg-5">
+                <div class="p-4 rounded-4 bg-white border h-100 shadow-sm">
+                    <h3 class="fw-bold mb-4">Contact Information</h3>
+                    <p class="text-muted mb-5">Feel free to drop by, call, or email us. Our support team is ready to answer your technical and agronomic queries.</p>
+                    
+                    <div class="d-flex align-items-start gap-3 mb-4">
+                        <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                            <i class="bi bi-geo-alt-fill fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">Our Location</h5>
+                            <p class="text-muted mb-0">128 Green Valley Farm Road, Isanpur</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-start gap-3 mb-4">
+                        <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                            <i class="bi bi-envelope-fill fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">Email Us</h5>
+                            <p class="text-muted mb-0">support@smartfarmer.com<br>info@smartfarmer.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-start gap-3 mb-4">
+                        <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                            <i class="bi bi-telephone-fill fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">Call Us</h5>
+                            <p class="text-muted mb-0">+919227253132<br>Mon-Fri, 9:00 AM - 6:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Side: Contact Form -->
+            <div class="col-lg-7">
+                <div class="p-4 p-md-5 rounded-4 bg-white border shadow-sm">
+                    <h3 class="fw-bold mb-4">Send Us a Message</h3>
+                    
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label fw-semibold">Your Name</label>
+                                <input type="text" class="form-control form-control-custom" id="name" name="name" placeholder="Dev Roa" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="email" class="form-label fw-semibold">Email Address</label>
+                                <input type="email" class="form-control form-control-custom" id="email" name="email" placeholder="dev@example.com" required>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label for="subject" class="form-label fw-semibold">Subject</label>
+                                <input type="text" class="form-control form-control-custom" id="subject" name="subject" placeholder="Crop advisory inquiry" required>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label for="message" class="form-label fw-semibold">Your Message</label>
+                                <textarea class="form-control form-control-custom" id="message" name="message" rows="5" placeholder="Write your message here..." required></textarea>
+                            </div>
+                            
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-premium w-100 py-3">Send Message <i class="bi bi-send-fill ms-2"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

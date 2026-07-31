@@ -1,0 +1,118 @@
+{% extends 'core/dashboard_base.html' %}
+{% block title %}Smart Farmer Assistant - {{ crop.get_name_display }} Details{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">🔍 Crop Details</h2>
+            <p class="text-muted mb-0">Full database parameters for this crop entry.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'crops:my_crops' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-short me-1"></i> Back to List
+            </a>
+            <a href="{% url 'crops:crop_update' crop.pk %}" class="btn btn-outline-primary">
+                <i class="bi bi-pencil-fill me-1"></i> Edit Crop
+            </a>
+            <a href="{% url 'crops:crop_delete' crop.pk %}" class="btn btn-outline-danger">
+                <i class="bi bi-trash3-fill me-1"></i> Delete
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Crop Image Panel -->
+        <div class="col-lg-5">
+            <div class="p-4 rounded-4 bg-white border shadow-sm text-center">
+                <h5 class="fw-bold text-success mb-3 text-start"><i class="bi bi-image me-2"></i>Crop Photograph</h5>
+                {% if crop.image %}
+                <div class="rounded-4 overflow-hidden border mb-3" style="max-height: 350px;">
+                    <img src="{{ crop.image.url }}" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="{{ crop.get_name_display }}">
+                </div>
+                {% else %}
+                <div class="py-5 rounded-4 bg-light text-muted border border-dashed mb-3 d-flex flex-column align-items-center justify-content-center" style="height: 250px;">
+                    <i class="bi bi-camera fs-1 mb-2 text-secondary"></i>
+                    <span>No Image Uploaded</span>
+                    <small class="text-muted mt-1">Edit crop details to upload an image.</small>
+                </div>
+                {% endif %}
+                
+                <div class="mt-3 text-start">
+                    <span class="text-muted d-block small">Owner Farmer</span>
+                    <span class="fw-semibold text-dark">{{ crop.farmer.first_name }} {{ crop.farmer.last_name }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crop Stats Panel -->
+        <div class="col-lg-7">
+            <div class="p-4 p-md-5 rounded-4 bg-white border shadow-sm h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <h3 class="fw-bold text-success mb-0">{{ crop.get_name_display }}</h3>
+                    {% if crop.status == 'Growing' %}
+                    <span class="badge bg-primary bg-opacity-15 text-primary fs-6 py-2 px-3">{{ crop.get_status_display }}</span>
+                    {% elif crop.status == 'Ready to Harvest' %}
+                    <span class="badge bg-warning bg-opacity-15 text-warning-emphasis fs-6 py-2 px-3">{{ crop.get_status_display }}</span>
+                    {% else %}
+                    <span class="badge bg-success bg-opacity-15 text-success fs-6 py-2 px-3">{{ crop.get_status_display }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Growth Progress Bar -->
+                <div class="mb-4 p-3 bg-light rounded-3 border">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small fw-semibold">Dynamic Growth Progress</span>
+                        <span class="badge bg-{{ crop.progress_data.color }} bg-opacity-15 text-{{ crop.progress_data.color }} fw-bold">{{ crop.progress_data.label }}</span>
+                    </div>
+                    <div class="progress" style="height: 10px; border-radius: 5px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-{{ crop.progress_data.color }}" role="progressbar" style="width: {{ crop.progress_data.percent }}%;" aria-valuenow="{{ crop.progress_data.percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle fs-6">
+                        <tbody>
+                            <tr>
+                                <td class="text-muted py-3 fw-semibold"><i class="bi bi-tag text-success me-2"></i>Crop Variety</td>
+                                <td class="fw-bold text-dark py-3">{{ crop.variety }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted py-3 fw-semibold"><i class="bi bi-aspect-ratio text-success me-2"></i>Cultivated Area</td>
+                                <td class="fw-bold text-dark py-3">{{ crop.land_size }} Acres</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted py-3 fw-semibold"><i class="bi bi-calendar-event text-success me-2"></i>Sowing Date</td>
+                                <td class="fw-bold text-dark py-3">{{ crop.sowing_date|date:"d/m/Y" }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted py-3 fw-semibold"><i class="bi bi-calendar-check text-success me-2"></i>Expected Harvest</td>
+                                <td class="fw-bold text-dark py-3">{{ crop.expected_harvest_date|date:"d/m/Y" }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted py-3 fw-semibold"><i class="bi bi-box-seam text-success me-2"></i>Expected Yield</td>
+                                <td class="fw-bold text-dark py-3">{{ crop.expected_yield }} Quintals</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 p-4 bg-light rounded-4 border">
+                    <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-cash-stack text-success me-2"></i>Financial Projections</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6 border-end">
+                            <span class="text-muted d-block small mb-1">Total Sunk Investment</span>
+                            <span class="fw-bold text-danger fs-4">₹ {{ crop.investment_cost }}</span>
+                        </div>
+                        <div class="col-md-6 ps-md-4">
+                            <span class="text-muted d-block small mb-1">Estimated Market Revenue</span>
+                            <span class="fw-bold text-success fs-4">₹ {{ crop.estimated_revenue }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

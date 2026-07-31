@@ -1,0 +1,135 @@
+{% extends 'core/dashboard_base.html' %}
+{% block title %}Smart Farmer Assistant - {{ title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">{% if crop %}✏️ Update Crop Cultivation{% else %}➕ Record Crop Cultivation{% endif %}</h2>
+            <p class="text-muted mb-0">Record investments, sowing schedules, and expected yields for your land in Sabarkantha.</p>
+        </div>
+        <div>
+            <a href="{% url 'crops:my_crops' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-short me-1"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Form Panel Card -->
+    <div class="p-4 p-md-5 rounded-4 bg-white border shadow-sm">
+        <form method="POST" action="" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger mb-4" style="border-radius: 12px;">
+                {% for error in form.non_field_errors %}
+                <div><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <h5 class="fw-bold text-success border-bottom pb-2 mb-4">Crop & Variety Information</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label for="{{ form.name.id_for_label }}" class="form-label fw-semibold">Crop Name *</label>
+                    {{ form.name }}
+                    {% for error in form.name.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="{{ form.variety.id_for_label }}" class="form-label fw-semibold">Crop Variety *</label>
+                    {{ form.variety }}
+                    {% for error in form.variety.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <h5 class="fw-bold text-success border-bottom pb-2 mb-4 mt-5">Sowing & Harvest Schedule</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label for="{{ form.sowing_date.id_for_label }}" class="form-label fw-semibold">Sowing Date *</label>
+                    {{ form.sowing_date }}
+                    {% for error in form.sowing_date.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="{{ form.expected_harvest_date.id_for_label }}" class="form-label fw-semibold">Expected Harvest Date *</label>
+                    {{ form.expected_harvest_date }}
+                    {% for error in form.expected_harvest_date.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <h5 class="fw-bold text-success border-bottom pb-2 mb-4 mt-5">Land & Yield Metrics (Sabarkantha Region)</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6 col-lg-3">
+                    <label for="{{ form.land_size.id_for_label }}" class="form-label fw-semibold">Land Size (Acres) *</label>
+                    {{ form.land_size }}
+                    {% for error in form.land_size.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <label for="{{ form.investment_cost.id_for_label }}" class="form-label fw-semibold">Investment Sunk (₹) *</label>
+                    {{ form.investment_cost }}
+                    {% for error in form.investment_cost.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <label for="{{ form.expected_yield.id_for_label }}" class="form-label fw-semibold">Expected Yield (Quintals) *</label>
+                    {{ form.expected_yield }}
+                    {% for error in form.expected_yield.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <label for="{{ form.estimated_revenue.id_for_label }}" class="form-label fw-semibold">Expected Revenue (₹) *</label>
+                    {{ form.estimated_revenue }}
+                    {% for error in form.estimated_revenue.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <h5 class="fw-bold text-success border-bottom pb-2 mb-4 mt-5">Status & Visual Upload</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label for="{{ form.status.id_for_label }}" class="form-label fw-semibold">Crop Status *</label>
+                    {{ form.status }}
+                    {% for error in form.status.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="{{ form.image.id_for_label }}" class="form-label fw-semibold">Crop Image (Optional)</label>
+                    {{ form.image }}
+                    {% for error in form.image.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                    {% if crop.image %}
+                    <div class="mt-2 text-muted small">Current: <a href="{{ crop.image.url }}" target="_blank">{{ crop.image.name }}</a></div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <button type="submit" class="btn btn-premium w-100 py-3">
+                    {% if crop %}Save Crop Updates <i class="bi bi-save-fill ms-1"></i>{% else %}Record Crop Entry <i class="bi bi-plus-circle-fill ms-1"></i>{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

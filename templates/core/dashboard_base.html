@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-0 dashboard-container">
+    <div class="row g-0 h-100">
+        <!-- Sidebar Navigation -->
+        <aside class="col-lg-3 col-xl-2 px-0">
+            <div class="sidebar-wrapper">
+                <ul class="sidebar-menu">
+                    <li>
+                        <a href="{% url 'dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                            <i class="bi bi-grid-1x2-fill"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'crops:my_crops' %}" class="sidebar-link {% if request.resolver_match.namespace == 'crops' and request.resolver_match.url_name == 'my_crops' %}active{% endif %}">
+                            <i class="bi bi-calendar4-range"></i>
+                            <span>My Crops</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'crops:crop_analytics' %}" class="sidebar-link {% if request.resolver_match.namespace == 'crops' and request.resolver_match.url_name == 'crop_analytics' %}active{% endif %}">
+                            <i class="bi bi-bar-chart-line-fill"></i>
+                            <span>Crop Analytics</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'crop_library' %}" class="sidebar-link {% if request.resolver_match.url_name == 'crop_library' %}active{% endif %}">
+                            <i class="bi bi-flower1"></i>
+                            <span>Crop Library</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'weather_updates' %}" class="sidebar-link {% if request.resolver_match.url_name == 'weather_updates' %}active{% endif %}">
+                            <i class="bi bi-cloud-sun"></i>
+                            <span>Weather Updates</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'market_prices' %}" class="sidebar-link {% if request.resolver_match.url_name == 'market_prices' %}active{% endif %}">
+                            <i class="bi bi-currency-rupee"></i>
+                            <span>Market Prices</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'disease_prediction' %}" class="sidebar-link {% if request.resolver_match.url_name == 'disease_prediction' %}active{% endif %}">
+                            <i class="bi bi-virus"></i>
+                            <span>Disease Prediction</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'leaf_scanner:scan' %}" class="sidebar-link {% if request.resolver_match.namespace == 'leaf_scanner' %}active{% endif %}">
+                            <i class="bi bi-camera-fill"></i>
+                            <span>AI Leaf Scanner</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'fertilizer_guide' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fertilizer_guide' %}active{% endif %}">
+                            <i class="bi bi-droplet"></i>
+                            <span>Fertilizer Guide</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'farming_news' %}" class="sidebar-link {% if request.resolver_match.url_name == 'farming_news' %}active{% endif %}">
+                            <i class="bi bi-newspaper"></i>
+                            <span>Farming News</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'profile' %}" class="sidebar-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                            <i class="bi bi-person-fill-gear"></i>
+                            <span>Profile Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'logout' %}" class="sidebar-link text-danger">
+                            <i class="bi bi-box-arrow-left"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+        
+        <!-- Main Dashboard Content Panel -->
+        <main class="col-lg-9 col-xl-10 p-4 p-md-5">
+            {% block dashboard_content %}
+            {% endblock %}
+        </main>
+    </div>
+</div>
+{% endblock %}

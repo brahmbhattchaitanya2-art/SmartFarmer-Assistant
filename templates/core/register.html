@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block title %}Smart Farmer Assistant - Register{% endblock %}
+
+{% block content %}
+<section class="py-5 my-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-xl-8">
+                <div class="premium-card shadow-lg p-4 p-md-5 border bg-white">
+                    <div class="text-center mb-5">
+                        <div class="card-icon-container mx-auto">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </div>
+                        <h2 class="fw-bold mt-3">Farmer Registration</h2>
+                        <p class="text-muted">Register to get custom Indian crop recommendations, soil advise, and yield monitoring</p>
+                    </div>
+
+                    <form method="POST" action="{% url 'register' %}" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <h5 class="fw-bold text-success border-bottom pb-2 mb-4"><i class="bi bi-person-badge me-2"></i>Account & Personal Details</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.username.id_for_label }}" class="form-label fw-semibold">Username *</label>
+                                <input type="text" name="username" id="{{ form.username.id_for_label }}" class="form-control form-control-custom {% if form.username.errors %}is-invalid{% endif %}" value="{{ form.username.value|default_if_none:'' }}" placeholder="Choose a username" required>
+                                {% for error in form.username.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                                <small class="text-muted">Username must be unique.</small>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold">Email Address *</label>
+                                <input type="email" name="email" id="{{ form.email.id_for_label }}" class="form-control form-control-custom {% if form.email.errors %}is-invalid{% endif %}" value="{{ form.email.value|default_if_none:'' }}" placeholder="example@mail.com" required>
+                                {% for error in form.email.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label fw-semibold">First Name *</label>
+                                <input type="text" name="first_name" id="{{ form.first_name.id_for_label }}" class="form-control form-control-custom {% if form.first_name.errors %}is-invalid{% endif %}" value="{{ form.first_name.value|default_if_none:'' }}" placeholder="e.g. Ramesh" required>
+                                {% for error in form.first_name.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label fw-semibold">Last Name *</label>
+                                <input type="text" name="last_name" id="{{ form.last_name.id_for_label }}" class="form-control form-control-custom {% if form.last_name.errors %}is-invalid{% endif %}" value="{{ form.last_name.value|default_if_none:'' }}" placeholder="e.g. Kumar" required>
+                                {% for error in form.last_name.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.password1.id_for_label }}" class="form-label fw-semibold">Password *</label>
+                                <input type="password" name="password1" id="{{ form.password1.id_for_label }}" class="form-control form-control-custom {% if form.password1.errors %}is-invalid{% endif %}" placeholder="Enter strong password" required>
+                                {% for error in form.password1.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="{{ form.password2.id_for_label }}" class="form-label fw-semibold">Confirm Password *</label>
+                                <input type="password" name="password2" id="{{ form.password2.id_for_label }}" class="form-control form-control-custom {% if form.password2.errors %}is-invalid{% endif %}" placeholder="Re-enter password" required>
+                                {% for error in form.password2.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-success border-bottom pb-2 mb-4 mt-5"><i class="bi bi-geo-alt-fill me-2"></i>Farming & Local Address</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.phone_number.id_for_label }}" class="form-label fw-semibold">Mobile Number (Indian format) *</label>
+                                <input type="text" name="phone_number" id="{{ form.phone_number.id_for_label }}" class="form-control form-control-custom {% if form.phone_number.errors %}is-invalid{% endif %}" value="{{ form.phone_number.value|default_if_none:'' }}" placeholder="e.g. 9876543210" required>
+                                {% for error in form.phone_number.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+
+                            <div class="col-md-4">
+                                <label for="{{ form.village.id_for_label }}" class="form-label fw-semibold">Village *</label>
+                                <input type="text" name="village" id="{{ form.village.id_for_label }}" class="form-control form-control-custom {% if form.village.errors %}is-invalid{% endif %}" value="{{ form.village.value|default_if_none:'' }}" placeholder="e.g. Rampur" required>
+                                {% for error in form.village.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="{{ form.district.id_for_label }}" class="form-label fw-semibold">District *</label>
+                                <input type="text" name="district" id="{{ form.district.id_for_label }}" class="form-control form-control-custom {% if form.district.errors %}is-invalid{% endif %}" value="{{ form.district.value|default_if_none:'' }}" placeholder="e.g. Patiala" required>
+                                {% for error in form.district.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="{{ form.state.id_for_label }}" class="form-label fw-semibold">State *</label>
+                                <select name="state" id="{{ form.state.id_for_label }}" class="form-select form-control-custom {% if form.state.errors %}is-invalid{% endif %}" required>
+                                    {% for choice in form.fields.state.choices %}
+                                    <option value="{{ choice.0 }}" {% if form.state.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% for error in form.state.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.land_size.id_for_label }}" class="form-label fw-semibold">Land Size (in Acres) *</label>
+                                <input type="number" name="land_size" step="0.01" id="{{ form.land_size.id_for_label }}" class="form-control form-control-custom {% if form.land_size.errors %}is-invalid{% endif %}" value="{{ form.land_size.value|default_if_none:'' }}" placeholder="e.g. 5.5" required>
+                                {% for error in form.land_size.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-premium w-100 py-3">Register Account <i class="bi bi-check-circle ms-2"></i></button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <span class="text-muted">Already registered?</span>
+                        <a href="{% url 'login' %}" class="text-success fw-bold text-decoration-none ms-1">Sign In here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

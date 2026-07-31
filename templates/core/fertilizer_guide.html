@@ -1,0 +1,206 @@
+{% extends 'core/dashboard_base.html' %}
+{% load static %}
+{% block title %}Smart Farmer Assistant - Fertilizer Guide{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold mb-0">🧪 Soil Fertilizer Guide</h2>
+            <p class="text-muted mb-0">Get precise N-P-K recommendation, dosage calculators, and safety advisories for your farm.</p>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Left Column: Input Form -->
+        <div class="col-lg-5">
+            <div class="p-4 rounded-4 bg-white border shadow-sm h-100">
+                <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-sliders me-2 text-success"></i>Calculate Dosage</h4>
+                <hr class="mb-4">
+                
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="id_crop_name" class="form-label fw-semibold text-dark">Crop Name</label>
+                        <select name="crop_name" id="id_crop_name" class="form-select border rounded-3 p-2.5">
+                            {% for val, label in form.crop_name.field.choices %}
+                            <option value="{{ val }}" {% if form.crop_name.value == val %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.crop_name.errors %}
+                        <div class="text-danger small mt-1">{{ form.crop_name.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_soil_type" class="form-label fw-semibold text-dark">Soil Type</label>
+                        <select name="soil_type" id="id_soil_type" class="form-select border rounded-3 p-2.5">
+                            {% for val, label in form.soil_type.field.choices %}
+                            <option value="{{ val }}" {% if form.soil_type.value == val %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.soil_type.errors %}
+                        <div class="text-danger small mt-1">{{ form.soil_type.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_crop_stage" class="form-label fw-semibold text-dark">Crop Growth Stage</label>
+                        <select name="crop_stage" id="id_crop_stage" class="form-select border rounded-3 p-2.5">
+                            {% for val, label in form.crop_stage.field.choices %}
+                            <option value="{{ val }}" {% if form.crop_stage.value == val %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.crop_stage.errors %}
+                        <div class="text-danger small mt-1">{{ form.crop_stage.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-premium w-100 py-2.5 fw-bold rounded-3">
+                        <i class="bi bi-calculator me-2"></i>Generate Recommendation
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column: Results Screen -->
+        <div class="col-lg-7">
+            <div class="p-4 rounded-4 bg-white border shadow-sm h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-prescription me-2 text-success"></i>Recommended Prescription</h4>
+                    <hr class="mb-4">
+                    
+                    {% if result %}
+                    <div class="recommendation-result fade-in">
+                        <div class="alert alert-success border-success border-opacity-25 rounded-3 mb-4 p-3 bg-success bg-opacity-10 text-success d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Optimized Recipe Generated</h6>
+                                <span class="small text-muted">Recommended for {{ result.crop_name }} on {{ result.soil_type }} during {{ result.crop_stage }}</span>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <!-- Fertilizer Name -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <span class="text-muted d-block small text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Fertilizer Name</span>
+                                    <span class="fw-bold text-dark fs-5"><i class="bi bi-droplet me-2 text-success"></i>{{ result.fertilizer_name }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- NPK Ratio -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <span class="text-muted d-block small text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.5px;">NPK Composition</span>
+                                    <span class="fw-bold text-dark fs-5"><i class="bi bi-percent me-2 text-success"></i>{{ result.npk_ratio }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Quantity per Acre -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <span class="text-muted d-block small text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Quantity Per Acre</span>
+                                    <span class="fw-bold text-dark fs-6 text-success"><i class="bi bi-box-seam me-2"></i>{{ result.quantity_per_acre }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Application Method -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <span class="text-muted d-block small text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Application Method</span>
+                                    <span class="fw-bold text-dark fs-6"><i class="bi bi-hand-index-thumb me-2 text-success"></i>{{ result.application_method }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Best Application Time -->
+                            <div class="col-12">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <span class="text-muted d-block small text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Best Application Schedule</span>
+                                    <span class="fw-bold text-dark small d-block mt-1"><i class="bi bi-calendar-event me-2 text-success"></i>{{ result.best_time }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Safety Precautions -->
+                            <div class="col-12">
+                                <div class="p-3 border border-danger border-opacity-10 rounded-3 bg-danger bg-opacity-10 text-danger">
+                                    <span class="text-danger d-block small text-uppercase fw-bold mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;"><i class="bi bi-exclamation-triangle-fill me-1"></i>Safety Precautions</span>
+                                    <p class="small mb-0">{{ result.safety_precautions }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- No Prescription State -->
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-prescription fs-1 d-block mb-3 opacity-25"></i>
+                        <h5>No Active Prescription</h5>
+                        <p class="small">Fill in your cultivation parameters on the left and click "Generate Recommendation" to view custom recipes.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Panel -->
+    <div class="p-4 rounded-4 bg-white border shadow-sm mb-5">
+        <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-clock-history me-2 text-success"></i>Recommendation History Log</h4>
+        <hr class="mb-4">
+        
+        {% if history %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col" style="font-size: 0.85rem;">Date</th>
+                        <th scope="col" style="font-size: 0.85rem;">Crop</th>
+                        <th scope="col" style="font-size: 0.85rem;">Soil Type</th>
+                        <th scope="col" style="font-size: 0.85rem;">Growth Stage</th>
+                        <th scope="col" style="font-size: 0.85rem;">Fertilizer Recommended</th>
+                        <th scope="col" style="font-size: 0.85rem;">Quantity Per Acre</th>
+                        <th scope="col" style="font-size: 0.85rem;">Method</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in history %}
+                    <tr style="font-size: 0.9rem;">
+                        <td class="text-muted">{{ item.created_at|date:"d/m/Y H:i" }}</td>
+                        <td class="fw-bold text-dark">
+                            {% for val, label in crop_choices %}
+                                {% if val == item.crop_name %}{{ label }}{% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>{{ item.soil_type }}</td>
+                        <td>
+                            <span class="badge rounded-pill {% if 'Basal' in item.crop_stage %}bg-success{% elif 'Vegetative' in item.crop_stage %}bg-primary{% else %}bg-warning text-dark{% endif %} bg-opacity-10 {% if 'Basal' in item.crop_stage %}text-success{% elif 'Vegetative' in item.crop_stage %}text-primary{% else %}text-warning{% endif %}">
+                                {{ item.crop_stage }}
+                            </span>
+                        </td>
+                        <td class="fw-semibold text-success">{{ item.fertilizer_name }}</td>
+                        <td class="text-dark small">{{ item.quantity_per_acre }}</td>
+                        <td class="text-muted small">{{ item.application_method }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+            <i class="bi bi-inbox fs-2 d-block mb-2 opacity-25"></i>
+            <p class="small mb-0">No past recommendations logged yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

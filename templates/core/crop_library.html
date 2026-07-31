@@ -1,0 +1,120 @@
+{% extends 'core/dashboard_base.html' %}
+{% load static %}
+{% block title %}Smart Farmer Assistant - Crop Library{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">🌱 Agri-Crop Reference Library</h2>
+            <p class="text-muted mb-0">Detailed cultivation guides, sowing calendars, soil matching, and fertilizer guides for Gujarat crops.</p>
+        </div>
+        
+        <!-- Search & Filter Controls -->
+        <form method="GET" action="" class="d-flex gap-2 flex-wrap" style="max-width: 600px; width: 100%;">
+            <div class="input-group" style="width: auto; flex-grow: 1;">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Search Crop Name, Soil, Diseases..." value="{{ search_query }}">
+            </div>
+            
+            <select name="season" class="form-select" style="width: auto; max-width: 150px;" onchange="this.form.submit()">
+                {% for s in seasons %}
+                <option value="{{ s }}" {% if selected_season == s %}selected{% endif %}>{{ s }} Season</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-premium">Filter</button>
+        </form>
+    </div>
+
+    <!-- Crops Grid -->
+    {% if crops %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-5">
+        {% for crop in crops %}
+        <div class="col">
+            <div class="card h-100 border rounded-4 shadow-sm overflow-hidden premium-card" style="transition: all 0.3s ease;">
+                
+                <!-- Crop Image Container with Fallback -->
+                <div class="crop-image-container position-relative bg-light" style="height: 180px; overflow: hidden;">
+                    {% if crop.image_path %}
+                    <img src="{% static crop.image_path %}" class="w-100 h-100 object-fit-cover" alt="{{ crop.name }}" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none'); this.nextElementSibling.classList.add('d-flex');">
+                    {% endif %}
+                    <div class="crop-img-fallback {% if crop.image_path %}d-none{% else %}d-flex{% endif %} w-100 h-100 align-items-center justify-content-center text-white" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
+                        <div class="text-center">
+                            <i class="bi bi-tree fs-1 d-block mb-1"></i>
+                            <span class="small fw-bold text-uppercase tracking-wider">{{ crop.name }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Season Badge -->
+                    <span class="position-absolute top-0 end-0 m-3 badge rounded-pill px-3 py-1.5 {% if crop.season == 'Kharif' %}bg-success{% elif crop.season == 'Rabi' %}bg-primary{% else %}bg-warning text-dark{% endif %} shadow-sm">
+                        {{ crop.season }}
+                    </span>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <h4 class="fw-bold mb-0 text-dark">{{ crop.name }}</h4>
+                        <span class="text-success small fw-semibold"><i class="bi bi-tag-fill me-1"></i>{{ crop.gujarati_name }}</span>
+                    </div>
+
+                    <!-- Grid Specifications -->
+                    <div class="row g-2 mb-3 bg-light p-3 rounded-3 border" style="font-size: 0.85rem;">
+                        <div class="col-6">
+                            <span class="text-muted d-block small">Soil Type</span>
+                            <span class="fw-semibold text-dark">{{ crop.soil_type }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block small">Temp Range</span>
+                            <span class="fw-semibold text-dark">{{ crop.temperature_range }}</span>
+                        </div>
+                        <div class="col-12"><hr class="my-1 border-secondary border-opacity-10"></div>
+                        <div class="col-6">
+                            <span class="text-muted d-block small">Sowing Time</span>
+                            <span class="fw-semibold text-dark">{{ crop.sowing_time }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block small">Harvest Time</span>
+                            <span class="fw-semibold text-dark">{{ crop.harvest_time }}</span>
+                        </div>
+                        <div class="col-12"><hr class="my-1 border-secondary border-opacity-10"></div>
+                        <div class="col-6">
+                            <span class="text-muted d-block small">Rainfall</span>
+                            <span class="fw-semibold text-dark">{{ crop.rainfall_requirement }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block small">Expected Yield</span>
+                            <span class="fw-semibold text-dark">{{ crop.expected_yield }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Diseases & Fertilizers -->
+                    <div class="mb-3">
+                        <span class="text-muted d-block small fw-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Common Diseases</span>
+                        <p class="small text-danger mb-0"><i class="bi bi-bug me-1"></i>{{ crop.common_diseases }}</p>
+                    </div>
+
+                    <div>
+                        <span class="text-muted d-block small fw-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Suitable Fertilizers</span>
+                        <p class="small text-success mb-0"><i class="bi bi-droplet-fill me-1"></i>{{ crop.suitable_fertilizers }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5 bg-white border rounded-4 shadow-sm my-4">
+        <div class="card-icon-container mx-auto mb-3 bg-light text-muted">
+            <i class="bi bi-search fs-1"></i>
+        </div>
+        <h5>No Crops Found</h5>
+        <p class="text-muted small">No crops in the library match your search term or season filter.</p>
+        <a href="{% url 'crop_library' %}" class="btn btn-premium px-4 py-2 mt-2">Reset Filters</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

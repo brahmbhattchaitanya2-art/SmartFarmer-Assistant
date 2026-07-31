@@ -1,0 +1,365 @@
+{% extends 'core/dashboard_base.html' %}
+{% block title %}Smart Farmer Assistant - AI Leaf Scanner{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">🍃 AI Leaf Disease Scanner</h2>
+            <p class="text-muted mb-0">Upload a leaf photo or capture one using your camera to identify diseases instantly via the trained MobileNetV2 classifier.</p>
+        </div>
+    </div>
+
+    <!-- Alert for Missing Model -->
+    {% if not model_exists %}
+    <div class="alert alert-warning border-warning-subtle p-4 rounded-4 mb-4 shadow-sm">
+        <div class="d-flex gap-3 align-items-center">
+            <div class="bg-warning bg-opacity-10 p-3 rounded-circle text-warning">
+                <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+            </div>
+            <div>
+                <h5 class="alert-heading fw-bold mb-1">Classifier Model is Missing</h5>
+                <p class="mb-0">The MobileNetV2 model has not been trained yet. Please open a terminal and run the manual training script: <code class="bg-dark text-white px-2 py-0.5 rounded">python leaf_scanner/train_model.py</code> to generate the model files.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4 mb-5">
+        <!-- Input Upload Column -->
+        <div class="col-lg-6">
+            <div class="p-4 p-md-5 rounded-4 bg-white border shadow-sm h-100">
+                <h4 class="fw-bold mb-4 text-dark"><i class="bi bi-upload me-2 text-success"></i>Upload or Capture Leaf</h4>
+                
+                <form method="POST" enctype="multipart/form-data" action="{% url 'leaf_scanner:scan' %}" id="scanForm">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Select a clear leaf image from your device, or snap a photo directly using your camera.</label>
+                        
+                        <!-- Drag-and-Drop Area -->
+                        <div class="upload-zone p-5 border border-2 border-dashed rounded-4 text-center bg-light position-relative cursor-pointer" id="dropZone" style="border-color: #198754 !important; transition: all 0.3s ease;">
+                            {{ form.image }}
+                            <div id="uploadInstructions">
+                                <i class="bi bi-camera-fill text-success" style="font-size: 3rem;"></i>
+                                <h5 class="fw-bold mt-3 text-dark">Tap to capture or upload</h5>
+                                <p class="text-muted small">Supports camera capture on mobile devices</p>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill">Supports: JPG, JPEG, PNG</span>
+                            </div>
+                            
+                            <!-- Local Image Preview -->
+                            <div id="imagePreviewContainer" class="d-none mt-2">
+                                <img id="imagePreview" src="#" alt="Leaf Preview" class="img-fluid rounded-3 border shadow-sm" style="max-height: 250px; object-fit: contain;">
+                                <div class="mt-3">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" id="btnRemoveImage">
+                                        <i class="bi bi-trash me-1"></i> Clear Selection
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Webcam Container -->
+                        <div id="webcamContainer" class="d-none mt-3 p-4 border border-2 rounded-4 text-center bg-light" style="border-color: #198754 !important;">
+                            <div class="position-relative d-inline-block w-100 mb-3" style="max-width: 400px;">
+                                <video id="webcamVideo" autoplay playsinline class="w-100 rounded-3 border shadow-sm" style="transform: scaleX(-1); aspect-ratio: 4/3; object-fit: cover;"></video>
+                                <canvas id="webcamCanvas" class="d-none"></canvas>
+                                <div id="webcamError" class="alert alert-danger d-none mt-2"></div>
+                            </div>
+                            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                <button type="button" class="btn btn-success px-4 py-2" id="btnCapturePhoto">
+                                    <i class="bi bi-camera-fill me-2"></i>Capture Photo
+                                </button>
+                                <button type="button" class="btn btn-warning px-4 py-2 d-none" id="btnRetakePhoto">
+                                    <i class="bi bi-arrow-counterclockwise me-2"></i>Retake
+                                </button>
+                                <button type="button" class="btn btn-outline-danger px-4 py-2" id="btnCancelCamera">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Webcam Trigger Button -->
+                        <div class="text-center mt-3" id="webcamTriggerContainer">
+                            <span class="text-muted small d-block mb-2">— OR —</span>
+                            <button type="button" class="btn btn-outline-success rounded-pill px-4 py-2 fw-semibold" id="btnOpenCamera">
+                                <i class="bi bi-camera-video-fill me-2"></i>Open Camera
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-premium w-100 py-3" id="btnSubmitScan" {% if not model_exists %}disabled{% endif %}>
+                        Run AI Diagnosis <i class="bi bi-cpu ms-2"></i>
+                    </button>
+                </form>
+
+                <!-- Loader Overlay -->
+                <div id="spinnerOverlay" class="d-none text-center p-5">
+                    <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5 class="fw-bold mt-4 text-dark">MobileNetV2 Running Diagnostics...</h5>
+                    <p class="text-muted small mb-0">Analyzing spatial patterns and discoloration patches on the leaf.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prediction Results Column -->
+        <div class="col-lg-6">
+            <div class="p-4 p-md-5 rounded-4 bg-white border shadow-sm h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h4 class="fw-bold mb-4 text-dark"><i class="bi bi-clipboard-pulse me-2 text-success"></i>Diagnostic Report</h4>
+                    
+                    {% if result %}
+                    <!-- Dynamic Diagnostic Visual Icon -->
+                    <div class="text-center mb-3">
+                        {% if result.is_healthy %}
+                        <div class="d-inline-flex p-3 rounded-circle bg-success bg-opacity-10 text-success mb-2 shadow-sm">
+                            <i class="bi bi-shield-fill-check" style="font-size: 3.5rem; line-height: 1;"></i>
+                        </div>
+                        {% else %}
+                        <div class="d-inline-flex p-3 rounded-circle bg-danger bg-opacity-10 text-danger mb-2 shadow-sm">
+                            <i class="bi bi-virus" style="font-size: 3.5rem; line-height: 1;"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Result Values Panel -->
+                    <div class="p-4 rounded-4 bg-light border mb-4">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <span class="text-muted d-block small mb-1">PLANT NAME</span>
+                                <h5 class="fw-bold text-dark mb-0">{{ result.plant_name }}</h5>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted d-block small mb-1">HEALTH STATUS</span>
+                                <span class="badge {% if result.is_healthy %}bg-success{% else %}bg-danger{% endif %} px-3 py-2 rounded-pill fw-bold">
+                                    {{ result.status }}
+                                </span>
+                            </div>
+                            <div class="col-12 border-top pt-3">
+                                <span class="text-muted d-block small mb-1">DISEASE / CONDITION</span>
+                                <h4 class="fw-bold text-success mb-0">{{ result.disease_name }}</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confidence Progress Bar -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small fw-semibold text-muted">Classification Confidence:</span>
+                            <span class="fw-bold text-success">{{ result.confidence }}%</span>
+                        </div>
+                        <div class="progress" style="height: 12px; border-radius: 6px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated {% if result.is_healthy %}bg-success{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ result.confidence }}%;" aria-valuenow="{{ result.confidence }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scan Image Preview -->
+                    <div class="text-center mt-3 border p-2 rounded bg-light">
+                        <span class="text-muted d-block small mb-2">Analyzed Photo Preview</span>
+                        <img src="{{ result.image_uri }}" alt="Uploaded leaf" class="img-fluid rounded border shadow-sm" style="max-height: 180px; object-fit: contain;">
+                    </div>
+
+                    {% else %}
+                    <div class="text-center py-5 my-auto text-muted">
+                        <div class="card-icon-container mx-auto mb-4 bg-light text-secondary">
+                            <i class="bi bi-camera fs-1"></i>
+                        </div>
+                        <h5>Diagnosis Report Pending</h5>
+                        <p class="small text-muted px-4">Upload or capture a close-up photo of the leaf on the left. The neural network will classify it and output the plant, disease, status, and confidence metrics.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Transparency configuration to overlay Django FileInput */
+    #leafImageInput {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 10;
+    }
+    .upload-zone:hover {
+        background-color: #f1f8f4 !important;
+        border-color: #198754 !important;
+        transform: scale(1.01);
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const fileInput = document.getElementById("leafImageInput");
+        const uploadInstructions = document.getElementById("uploadInstructions");
+        const imagePreviewContainer = document.getElementById("imagePreviewContainer");
+        const imagePreview = document.getElementById("imagePreview");
+        const btnRemoveImage = document.getElementById("btnRemoveImage");
+        const scanForm = document.getElementById("scanForm");
+        const spinnerOverlay = document.getElementById("spinnerOverlay");
+
+        // Webcam elements
+        const btnOpenCamera = document.getElementById("btnOpenCamera");
+        const btnCapturePhoto = document.getElementById("btnCapturePhoto");
+        const btnRetakePhoto = document.getElementById("btnRetakePhoto");
+        const btnCancelCamera = document.getElementById("btnCancelCamera");
+        const webcamContainer = document.getElementById("webcamContainer");
+        const webcamVideo = document.getElementById("webcamVideo");
+        const webcamCanvas = document.getElementById("webcamCanvas");
+        const webcamError = document.getElementById("webcamError");
+        const dropZone = document.getElementById("dropZone");
+        const webcamTriggerContainer = document.getElementById("webcamTriggerContainer");
+
+        let stream = null;
+
+        // Set file capture attribute for direct mobile camera access
+        fileInput.setAttribute("capture", "environment");
+
+        // Display local image preview upon selection
+        fileInput.addEventListener("change", function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.setAttribute("src", e.target.result);
+                    imagePreviewContainer.classList.remove("d-none");
+                    uploadInstructions.classList.add("d-none");
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Clear button action
+        btnRemoveImage.addEventListener("click", function(e) {
+            e.stopPropagation();
+            fileInput.value = "";
+            imagePreview.setAttribute("src", "#");
+            imagePreviewContainer.classList.add("d-none");
+            uploadInstructions.classList.remove("d-none");
+        });
+
+        // Trigger loading screen on submit
+        scanForm.addEventListener("submit", function() {
+            stopCamera();
+            scanForm.classList.add("d-none");
+            spinnerOverlay.classList.remove("d-none");
+        });
+
+        // Open Camera function
+        btnOpenCamera.addEventListener("click", async function() {
+            webcamError.classList.add("d-none");
+            webcamError.textContent = "";
+            
+            // Clear any existing folder upload preview
+            fileInput.value = "";
+            imagePreview.setAttribute("src", "#");
+            imagePreviewContainer.classList.add("d-none");
+            uploadInstructions.classList.remove("d-none");
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: "environment",
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    },
+                    audio: false
+                });
+                
+                webcamVideo.srcObject = stream;
+                webcamVideo.play();
+                
+                // Toggle UI blocks
+                dropZone.classList.add("d-none");
+                webcamTriggerContainer.classList.add("d-none");
+                webcamContainer.classList.remove("d-none");
+                
+                // Show capture, hide retake
+                btnCapturePhoto.classList.remove("d-none");
+                btnRetakePhoto.classList.add("d-none");
+            } catch (err) {
+                console.error("Camera access error:", err);
+                webcamError.textContent = "Camera access denied or not available. Please ensure camera permissions are granted.";
+                webcamError.classList.remove("d-none");
+                webcamContainer.classList.remove("d-none");
+                btnCapturePhoto.classList.add("d-none");
+                btnRetakePhoto.classList.add("d-none");
+            }
+        });
+
+        // Capture Photo function
+        btnCapturePhoto.addEventListener("click", function() {
+            if (!stream) return;
+            
+            // Freeze video playback
+            webcamVideo.pause();
+            
+            // Show retake button, hide capture button
+            btnCapturePhoto.classList.add("d-none");
+            btnRetakePhoto.classList.remove("d-none");
+
+            // Capture the image frame
+            webcamCanvas.width = webcamVideo.videoWidth || 640;
+            webcamCanvas.height = webcamVideo.videoHeight || 480;
+            const ctx = webcamCanvas.getContext("2d");
+            
+            // Mirror image horizontally to match preview
+            ctx.translate(webcamCanvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(webcamVideo, 0, 0, webcamCanvas.width, webcamCanvas.height);
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+            // Convert canvas content to blob and assign it to Django input file field
+            webcamCanvas.toBlob(function(blob) {
+                if (blob) {
+                    const file = new File([blob], "captured_leaf.jpg", { type: "image/jpeg" });
+                    const container = new DataTransfer();
+                    container.items.add(file);
+                    fileInput.files = container.files;
+                }
+            }, "image/jpeg", 0.95);
+        });
+
+        // Retake Photo function
+        btnRetakePhoto.addEventListener("click", function() {
+            // Resume video playback
+            webcamVideo.play();
+            
+            // Clear input file
+            fileInput.value = "";
+            
+            // Toggle buttons
+            btnCapturePhoto.classList.remove("d-none");
+            btnRetakePhoto.classList.add("d-none");
+        });
+
+        // Cancel Camera function
+        btnCancelCamera.addEventListener("click", function() {
+            stopCamera();
+            fileInput.value = "";
+            
+            // Toggle UI blocks
+            webcamContainer.classList.add("d-none");
+            dropZone.classList.remove("d-none");
+            webcamTriggerContainer.classList.remove("d-none");
+        });
+
+        // Stop Camera tracks helper
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            webcamVideo.srcObject = null;
+        }
+    });
+</script>
+{% endblock %}

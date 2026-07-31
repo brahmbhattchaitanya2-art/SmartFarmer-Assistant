@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Smart Farmer Assistant - Login{% endblock %}
+
+{% block content %}
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="premium-card shadow-lg p-4 p-md-5 border bg-white">
+                    <div class="text-center mb-4">
+                        <div class="card-icon-container mx-auto">
+                            <i class="bi bi-person-lock"></i>
+                        </div>
+                        <h2 class="fw-bold mt-3">Farmer Login</h2>
+                        <p class="text-muted">Enter your credentials to access your dashboard</p>
+                    </div>
+                    
+                    <form method="POST" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label fw-semibold">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
+                                <input type="text" name="username" id="id_username" class="form-control form-control-custom border-start-0 ps-0" placeholder="Username" required autofocus>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="id_password" class="form-label fw-semibold mb-0">Password</label>
+                                <a href="{% url 'password_reset' %}" class="text-success text-decoration-none smallfw-semibold">Forgot Password?</a>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
+                                <input type="password" name="password" id="id_password" class="form-control form-control-custom border-start-0 ps-0" placeholder="Password" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-premium w-100 py-3 mb-3">Sign In <i class="bi bi-box-arrow-in-right ms-2"></i></button>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <span class="text-muted">New to SmartFarmer?</span>
+                        <a href="{% url 'register' %}" class="text-success fw-bold text-decoration-none ms-1">Register Here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

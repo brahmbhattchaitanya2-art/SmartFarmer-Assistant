@@ -1,0 +1,124 @@
+{% extends 'core/dashboard_base.html' %}
+{% block title %}Smart Farmer Assistant - My Crops{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">🌾 My Cultivated Crops</h2>
+            <p class="text-muted mb-0">Manage and track crops currently sown on your fields.</p>
+        </div>
+        <div>
+            <button class="btn btn-premium" data-bs-toggle="modal" data-bs-target="#addCropModal">
+                <i class="bi bi-plus-circle me-1"></i> Add Sown Crop
+            </button>
+        </div>
+    </div>
+
+    <!-- Overview Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="p-3 bg-white border rounded-4 d-flex align-items-center gap-3 shadow-sm">
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                    <i class="bi bi-wallet2 fs-3"></i>
+                </div>
+                <div>
+                    <span class="text-muted d-block small">Total Investment</span>
+                    <h5 class="fw-bold mb-0 text-dark">{{ total_investment }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="p-3 bg-white border rounded-4 d-flex align-items-center gap-3 shadow-sm">
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                    <i class="bi bi-graph-up-arrow fs-3"></i>
+                </div>
+                <div>
+                    <span class="text-muted d-block small">Expected Income</span>
+                    <h5 class="fw-bold mb-0 text-success">{{ expected_total_revenue }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Crops Grid -->
+    <div class="row g-4">
+        {% for crop in active_crops %}
+        <div class="col-md-6">
+            <div class="premium-card p-4 border bg-white shadow-sm h-100">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h4 class="fw-bold text-success mb-1">{{ crop.name }}</h4>
+                        <span class="badge bg-light text-dark">{{ crop.variety }}</span>
+                    </div>
+                    <div>
+                        {% if crop.status == 'Healthy' %}
+                        <span class="badge bg-success bg-opacity-15 text-success px-3 py-2"><i class="bi bi-check-circle-fill me-1"></i> Healthy</span>
+                        {% else %}
+                        <span class="badge bg-warning bg-opacity-15 text-warning-emphasis px-3 py-2"><i class="bi bi-exclamation-triangle-fill me-1"></i> {{ crop.status }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <hr class="my-3">
+
+                <div class="row g-3">
+                    <div class="col-6">
+                        <span class="text-muted d-block small">Sown Area</span>
+                        <span class="fw-semibold text-dark">{{ crop.area }}</span>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-muted d-block small">Sowing Date</span>
+                        <span class="fw-semibold text-dark">{{ crop.sowing_date }}</span>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-muted d-block small">Expected Harvest</span>
+                        <span class="fw-semibold text-dark">{{ crop.expected_harvest }}</span>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-muted d-block small">Expected Yield</span>
+                        <span class="fw-semibold text-dark">{{ crop.expected_yield }}</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-light rounded-3 border">
+                    <div class="row">
+                        <div class="col-6 border-end">
+                            <span class="text-muted d-block small">Investment Sunk</span>
+                            <span class="fw-bold text-dark">{{ crop.investment }}</span>
+                        </div>
+                        <div class="col-6 ps-3">
+                            <span class="text-muted d-block small">Estimated Revenue</span>
+                            <span class="fw-bold text-success">{{ crop.expected_revenue }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Add Crop Modal (Placeholder) -->
+<div class="modal fade" id="addCropModal" tabindex="-1" aria-labelledby="addCropModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="addCropModalLabel">Record New Crop Cultivation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="text-muted">This form will allow you to select a crop type, record variety numbers, input expenses/investment values in Rupees, and track harvest dates.</p>
+                <div class="alert alert-info mb-0" style="border-radius: 12px;">
+                    <i class="bi bi-info-circle-fill me-2"></i> This action is currently a visual placeholder for Phase 3.
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-premium" data-bs-dismiss="modal">Proceed</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends 'core/dashboard_base.html' %}
+{% block title %}Smart Farmer Assistant - Market Prices{% endblock %}
+
+{% block dashboard_content %}
+<!-- Load Plotly library CDN once -->
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+<div class="fade-in-up">
+    <!-- Header with Search & Filter -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">💰 Market Prices (APMC Mandi Bhav)</h2>
+            <p class="text-muted mb-0">Live crop rates from nearest APMC markets in Sabarkantha (Himmatnagar, Talod, Idar) in ₹/Quintal.</p>
+        </div>
+        
+        <!-- Search bar -->
+        <form method="GET" action="" class="d-flex gap-2 flex-wrap" style="max-width: 600px; width: 100%;">
+            <div class="input-group" style="width: auto; flex-grow: 1;">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Search Mandi (e.g. Talod)" value="{{ search_query }}">
+            </div>
+            
+            <select name="crop" class="form-select" style="width: auto; max-width: 180px;" onchange="this.form.submit()">
+                {% for code, display in crop_choices %}
+                <option value="{{ code }}" {% if selected_crop == code %}selected{% endif %}>{{ display }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-premium">Search</button>
+        </form>
+    </div>
+
+    {% if empty_state %}
+    <!-- Empty State -->
+    <div class="text-center py-5 bg-white border rounded-4 shadow-sm my-4">
+        <div class="card-icon-container mx-auto mb-3 bg-light text-muted">
+            <i class="bi bi-currency-rupee fs-1"></i>
+        </div>
+        <h5>{% if error_message %}{{ error_message }}{% else %}No Mandi Data Available{% endif %}</h5>
+        <p class="text-muted small">{% if error_message %}Please check your connection or try again later.{% else %}Please run the seeding script to populate market rates in the database.{% endif %}</p>
+    </div>
+    {% else %}
+
+    <!-- Price Trend Chart Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-graph-up text-success me-2"></i>Mandi Price Trends (15-Day Chart)</h5>
+                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-1 rounded-pill"><i class="bi bi-info-circle me-1"></i>Selected Crop: {{ selected_crop }}</span>
+                </div>
+                
+                {% if chart_div %}
+                <div class="pe-3">
+                    {{ chart_div|safe }}
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-5">Historical data will appear after daily price records are collected</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Prices Card Deck Grid -->
+    <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-calendar2-check text-success me-2"></i>Daily Mandi Board ({{ latest_date|date:"d/m/Y" }})</h4>
+    <div class="row g-4 mb-5">
+        {% if card_prices %}
+            {% for item in card_prices %}
+            <div class="col-md-6 col-xl-3">
+                <div class="premium-card p-4 h-100 bg-white border shadow-sm d-flex flex-column justify-content-between hover-card">
+                    <div>
+                        <!-- Header icon + crop -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-inline-flex p-3 rounded-circle bg-success bg-opacity-10">
+                                <i class="bi {{ item.icon }}" style="font-size: 1.6rem; line-height: 1;"></i>
+                            </div>
+                            <span class="badge bg-light text-dark border small"><i class="bi bi-geo-alt-fill text-success me-1"></i>{{ item.mandi_name }}</span>
+                        </div>
+                        
+                        <h5 class="fw-bold mb-1 text-dark">{{ item.get_crop_name_display }}</h5>
+                        <span class="text-muted d-block small mb-3">Rates in ₹ per Quintal</span>
+                        
+                        <div class="d-flex align-items-baseline mb-2">
+                            <span class="fs-3 fw-bold text-dark">₹ {{ item.today_price|floatformat:0 }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted d-block small">Yesterday: ₹{{ item.yesterday_price|floatformat:0 }}</span>
+                        </div>
+                        <span class="badge bg-{{ item.trend_color }} bg-opacity-15 text-{{ item.trend_color }} fw-bold py-1 px-2 small">
+                            {{ item.trend_arrow }} {% if item.diff >= 0 %}+{% endif %}{{ item.diff|floatformat:0 }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="col-12">
+            <div class="text-center py-5 bg-white border rounded-4 text-muted shadow-sm">
+                <i class="bi bi-search fs-2 mb-2"></i>
+                <p class="mb-0">No matching APMC results found for "{{ search_query }}" under crop "{{ crop_filter }}".</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Mandi History Database Auditing Table -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                <h4 class="fw-bold mb-4"><i class="bi bi-clock-history me-2 text-success"></i>Mandi Price History Logs (SQLite)</h4>
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Trading Date</th>
+                                <th>Crop Name</th>
+                                <th>APMC Market Mandi</th>
+                                <th>Today Price (₹/Qtl)</th>
+                                <th>Yesterday Price (₹/Qtl)</th>
+                                <th>Price Variance</th>
+                                <th>Last Sync Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in mandi_history %}
+                            <tr>
+                                <td class="small text-muted">{{ record.price_date|date:"d/m/Y" }}</td>
+                                <td class="fw-bold text-success">{{ record.get_crop_name_display }}</td>
+                                <td>{{ record.mandi_name }}</td>
+                                <td class="fw-bold">₹ {{ record.today_price|floatformat:2 }}</td>
+                                <td>₹ {{ record.yesterday_price|floatformat:2 }}</td>
+                                <td>
+                                    {% if record.price_difference > 0 %}
+                                    <span class="badge bg-success bg-opacity-15 text-success fw-bold">▲ +{{ record.absolute_price_difference|floatformat:2 }}</span>
+                                    {% elif record.price_difference < 0 %}
+                                    <span class="badge bg-danger bg-opacity-15 text-danger fw-bold">▼ -{{ record.absolute_price_difference|floatformat:2 }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary bg-opacity-15 text-secondary fw-bold">▬ 0.00</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small text-muted">{{ record.last_updated|date:"d/m/Y H:i:s" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+{% endblock %}

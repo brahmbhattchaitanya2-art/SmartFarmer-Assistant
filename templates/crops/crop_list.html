@@ -1,0 +1,171 @@
+{% extends 'core/dashboard_base.html' %}
+{% block title %}Smart Farmer Assistant - My Crops{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">🌾 My Sown Crops</h2>
+            <p class="text-muted mb-0">Manage and track crops currently sown on your fields in Sabarkantha, Gujarat.</p>
+        </div>
+        <div>
+            <a href="{% url 'crops:crop_add' %}" class="btn btn-premium">
+                <i class="bi bi-plus-circle me-1"></i> Record Sown Crop
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="p-4 rounded-4 bg-white border shadow-sm mb-4">
+        <form method="GET" action="" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label for="search_input" class="form-label fw-semibold text-muted small">Search Crops</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="q" id="search_input" class="form-control form-control-custom border-start-0 ps-0" placeholder="Search by name or variety..." value="{{ search_query }}">
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <label for="status_select" class="form-label fw-semibold text-muted small">Filter by Status</label>
+                <select name="status" id="status_select" class="form-select form-control-custom">
+                    <option value="">All Statuses</option>
+                    {% for choice in status_choices %}
+                    <option value="{{ choice.0 }}" {% if status_filter == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-premium flex-grow-1 py-2">Apply Filters</button>
+                {% if search_query or status_filter %}
+                <a href="{% url 'crops:my_crops' %}" class="btn btn-outline-secondary py-2 px-3"><i class="bi bi-x-lg"></i></a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Overview Stats for Filtered Subset -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="p-3 bg-white border rounded-4 d-flex align-items-center gap-3 shadow-sm">
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                    <i class="bi bi-aspect-ratio fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted d-block small">Cultivated Land</span>
+                    <h6 class="fw-bold mb-0 text-dark">{{ total_land|default:"0.00" }} Acres</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 bg-white border rounded-4 d-flex align-items-center gap-3 shadow-sm">
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                    <i class="bi bi-wallet2 fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted d-block small">Sunk Investment</span>
+                    <h6 class="fw-bold mb-0 text-dark">₹ {{ total_investment|default:"0.00" }}</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 bg-white border rounded-4 d-flex align-items-center gap-3 shadow-sm">
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                    <i class="bi bi-graph-up-arrow fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted d-block small">Expected Revenue</span>
+                    <h6 class="fw-bold mb-0 text-success">₹ {{ total_revenue|default:"0.00" }}</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Crops Grid -->
+    {% if crops %}
+    <div class="row g-4">
+        {% for crop in crops %}
+        <div class="col-md-6 col-xl-4">
+            <div class="premium-card p-4 border bg-white shadow-sm h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h4 class="fw-bold text-success mb-1">{{ crop.get_name_display }}</h4>
+                            <span class="badge bg-light text-dark">{{ crop.variety }}</span>
+                        </div>
+                        <div>
+                            {% if crop.status == 'Growing' %}
+                            <span class="badge bg-primary bg-opacity-15 text-primary">{{ crop.get_status_display }}</span>
+                            {% elif crop.status == 'Ready to Harvest' %}
+                            <span class="badge bg-warning bg-opacity-15 text-warning-emphasis">{{ crop.get_status_display }}</span>
+                            {% else %}
+                            <span class="badge bg-success bg-opacity-15 text-success">{{ crop.get_status_display }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if crop.image %}
+                    <div class="mb-3 rounded-3 overflow-hidden border" style="height: 150px;">
+                        <img src="{{ crop.image.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ crop.get_name_display }}">
+                    </div>
+                    {% endif %}
+
+                    <!-- Growth Progress Bar -->
+                    <div class="my-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small fw-semibold">Growth Progress</span>
+                            <span class="badge bg-{{ crop.progress_data.color }} bg-opacity-15 text-{{ crop.progress_data.color }} fw-bold">{{ crop.progress_data.label }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px; border-radius: 4px;">
+                            <div class="progress-bar bg-{{ crop.progress_data.color }}" role="progressbar" style="width: {{ crop.progress_data.percent }}%;" aria-valuenow="{{ crop.progress_data.percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3 mt-2">
+                        <div class="col-6">
+                            <span class="text-muted d-block small">Sown Land</span>
+                            <span class="fw-semibold text-dark">{{ crop.land_size }} Acres</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block small">Sowing Date</span>
+                            <span class="fw-semibold text-dark">{{ crop.sowing_date|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block small">Expected Harvest</span>
+                            <span class="fw-semibold text-dark">{{ crop.expected_harvest_date|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block small">Expected Yield</span>
+                            <span class="fw-semibold text-dark">{{ crop.expected_yield }} Quintals</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <hr class="my-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted d-block small">Expected Revenue</span>
+                            <span class="fw-bold text-success">₹ {{ crop.estimated_revenue }}</span>
+                        </div>
+                        <a href="{% url 'crops:crop_detail' crop.pk %}" class="btn btn-outline-success btn-sm px-3">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5 bg-white border rounded-4 shadow-sm my-4">
+        <div class="card-icon-container mx-auto mb-3 bg-light text-muted">
+            <i class="bi bi-calendar-x fs-1"></i>
+        </div>
+        <h5>No Sown Crops Found</h5>
+        <p class="text-muted small">No crop cultivations match your criteria. Record a crop to start tracking your yields.</p>
+        <a href="{% url 'crops:crop_add' %}" class="btn btn-premium px-4 py-2 mt-2">Record Crop Cultivation</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

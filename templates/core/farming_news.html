@@ -1,0 +1,90 @@
+{% extends 'core/dashboard_base.html' %}
+{% load static %}
+{% block title %}Smart Farmer Assistant - Farming News{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">📰 Agricultural News & Scheme Alerts</h2>
+            <p class="text-muted mb-0">Stay informed with the latest farming guidelines, policy reforms, and agricultural research from reliable portals.</p>
+        </div>
+        
+        <div>
+            <a href="?refresh=true" class="btn btn-premium py-2 px-3 fw-bold rounded-3">
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh News
+            </a>
+        </div>
+    </div>
+
+    <!-- Error Banner -->
+    {% if error_message %}
+    <div class="alert alert-warning border-warning border-opacity-25 rounded-4 p-4 shadow-sm mb-4 d-flex align-items-start bg-warning bg-opacity-10 text-dark">
+        <i class="bi bi-exclamation-triangle-fill fs-3 text-warning me-3"></i>
+        <div>
+            <h5 class="fw-bold mb-1">Connection Alert</h5>
+            <p class="mb-0 text-muted small">{{ error_message }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- News Listing Grid -->
+    {% if news_list %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+        {% for item in news_list %}
+        <div class="col">
+            <div class="card h-100 border rounded-4 shadow-sm overflow-hidden premium-card" style="transition: all 0.3s ease;">
+                
+                <!-- News Image Header -->
+                <div class="news-image-container position-relative bg-light" style="height: 180px; overflow: hidden;">
+                    {% if item.image_url %}
+                    <img src="{{ item.image_url }}" class="w-100 h-100 object-fit-cover" alt="{{ item.title }}" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none'); this.nextElementSibling.classList.add('d-flex');">
+                    {% endif %}
+                    <div class="news-img-fallback {% if item.image_url %}d-none{% else %}d-flex{% endif %} w-100 h-100 align-items-center justify-content-center text-white" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
+                        <i class="bi bi-newspaper fs-1"></i>
+                    </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <!-- Category Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-2" style="font-size: 0.8rem;">
+                            <span class="text-success fw-bold"><i class="bi bi-bookmark-fill me-1"></i>{{ item.source_name }}</span>
+                            <span class="text-muted">{{ item.pub_date }}</span>
+                        </div>
+
+                        <!-- Title -->
+                        <h5 class="card-title fw-bold text-dark mb-2" style="line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8em;">
+                            {{ item.title }}
+                        </h5>
+
+                        <!-- Summary Paragraph -->
+                        <p class="card-text text-muted small mb-4" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 4.5em;">
+                            {{ item.summary }}
+                        </p>
+                    </div>
+
+                    <!-- CTA Read More -->
+                    <a href="{{ item.link }}" target="_blank" class="btn btn-outline-success w-100 rounded-3 py-2 fw-semibold" rel="noopener noreferrer">
+                        Read Full Article <i class="bi bi-box-arrow-up-right ms-1 small"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5 bg-white border rounded-4 shadow-sm my-4">
+        <div class="card-icon-container mx-auto mb-3 bg-light text-muted">
+            <i class="bi bi-newspaper fs-1"></i>
+        </div>
+        <h5>No News Logged</h5>
+        <p class="text-muted small">No agricultural news is currently cached. Click "Refresh News" to pull the latest headlines.</p>
+        <a href="?refresh=true" class="btn btn-premium px-4 py-2 mt-2">Pull Latest News</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

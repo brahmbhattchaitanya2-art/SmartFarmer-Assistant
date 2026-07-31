@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Smart Farmer Assistant - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 fade-in-up">
+                <span class="hero-tagline">
+                    <i class="bi bi-stars"></i> Next-Gen Agriculture
+                </span>
+                <h1 class="hero-title">Empowering Farmers With <span>Smart Technology</span></h1>
+                <p class="hero-desc">Transform your farming practices with data-driven crop suggestions, soil analysis, and real-time climate alerts. Maximize your harvest, minimize your costs.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'about' %}" class="btn btn-premium">Learn More <i class="bi bi-arrow-right-short ms-1"></i></a>
+                    <a href="{% url 'contact' %}" class="btn btn-premium-outline">Get in Touch</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center fade-in-up" style="animation-delay: 0.1s;">
+                <img src="{% static 'images/hero_banner.png' %}" class="img-fluid rounded-4 shadow-lg border" alt="Smart Farming Technology" style="max-height: 480px; width: 100%; object-fit: cover;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features / Services Section -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tagline">Key Capabilities</span>
+            <h2 class="section-title">Designed to Solve Real Farming Challenges</h2>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Feature 1: Crop Advisory -->
+            <div class="col-md-4">
+                <div class="premium-card h-100">
+                    <div class="card-icon-container">
+                        <i class="bi bi-flower1"></i>
+                    </div>
+                    <h4>Crop Recommendation</h4>
+                    <p class="text-muted mb-0">Get smart suggestions on which crops to plant based on your region's historical data, season, and soil qualities.</p>
+                </div>
+            </div>
+            
+            <!-- Feature 2: Soil Health -->
+            <div class="col-md-4">
+                <div class="premium-card h-100">
+                    <div class="card-icon-container">
+                        <i class="bi bi-droplet-half"></i>
+                    </div>
+                    <h4>Soil Analyzer</h4>
+                    <p class="text-muted mb-0">Understand your soil chemistry. Receive advice on nutrient enhancements to create the perfect environment for your crops.</p>
+                </div>
+            </div>
+            
+            <!-- Feature 3: Weather Alerts -->
+            <div class="col-md-4">
+                <div class="premium-card h-100">
+                    <div class="card-icon-container">
+                        <i class="bi bi-cloud-sun"></i>
+                    </div>
+                    <h4>Climate Monitoring</h4>
+                    <p class="text-muted mb-0">Stay ahead of the weather. Get immediate alerts regarding localized weather changes that could affect your yield.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Info Stats Section -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <h3 class="display-5 fw-bold text-success">98%</h3>
+                <p class="text-muted mb-0">User Satisfaction Rate</p>
+            </div>
+            <div class="col-md-4">
+                <h3 class="display-5 fw-bold text-success">15,000+</h3>
+                <p class="text-muted mb-0">Hectares Monitored</p>
+            </div>
+            <div class="col-md-4">
+                <h3 class="display-5 fw-bold text-success">30%</h3>
+                <p class="text-muted mb-0">Average Yield Increase</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="py-5 my-5 text-center">
+    <div class="container">
+        <div class="p-5 rounded-4 bg-success bg-gradient text-white shadow-lg position-relative overflow-hidden">
+            <div class="position-relative z-3">
+                <h2 class="fw-bold mb-3">Ready to Upgrade Your Farm?</h2>
+                <p class="lead mb-4 mx-auto" style="max-width: 600px;">Join thousands of modern farmers who are using SmartFarmer to optimize their agricultural workflow and secure their profits.</p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="#" class="btn btn-light btn-lg px-4 py-2 text-success fw-bold">Sign Up Free</a>
+                    <a href="{% url 'contact' %}" class="btn btn-outline-light btn-lg px-4 py-2">Consult Specialist</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

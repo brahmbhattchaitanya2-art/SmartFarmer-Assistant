@@ -1,0 +1,71 @@
+{% extends 'core/dashboard_base.html' %}
+{% block title %}Smart Farmer Assistant - Crop Library{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">🌱 Indian Crop Library</h2>
+            <p class="text-muted mb-0">Seasonal parameters, sowing guidelines, and Mandi price indexes.</p>
+        </div>
+    </div>
+
+    <!-- Active Crops Grid -->
+    <div class="row g-4">
+        {% for crop in crops %}
+        <div class="col-lg-6">
+            <div class="premium-card h-100 p-4 border bg-white shadow-sm">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h4 class="fw-bold text-success mb-1">{{ crop.name }}</h4>
+                        <span class="badge bg-success bg-opacity-15 text-success px-2 py-1">{{ crop.status }}</span>
+                    </div>
+                    <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                        <i class="bi bi-tree-fill fs-4"></i>
+                    </div>
+                </div>
+                
+                <hr class="my-3">
+                
+                <div class="row g-3">
+                    <div class="col-6">
+                        <span class="text-muted d-block small fw-semibold">Sowing Season</span>
+                        <span class="fw-semibold text-dark"><i class="bi bi-calendar-event text-success me-1"></i> {{ crop.sowing_season }}</span>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-muted d-block small fw-semibold">Harvest Season</span>
+                        <span class="fw-semibold text-dark"><i class="bi bi-calendar-check text-success me-1"></i> {{ crop.harvest_season }}</span>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-muted d-block small fw-semibold">Ideal Climate</span>
+                        <span class="fw-semibold text-dark"><i class="bi bi-thermometer-half text-success me-1"></i> {{ crop.ideal_temp }}</span>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-muted d-block small fw-semibold">Water Req.</span>
+                        <span class="fw-semibold text-dark"><i class="bi bi-droplet-fill text-success me-1"></i> {{ crop.ideal_rainfall }}</span>
+                    </div>
+                    <div class="col-12">
+                        <span class="text-muted d-block small fw-semibold">Preferred Soil Type</span>
+                        <span class="fw-semibold text-dark"><i class="bi bi-layers-half text-success me-1"></i> {{ crop.soil_type }}</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-light rounded-3 border">
+                    <div class="row">
+                        <div class="col-6 border-end">
+                            <span class="text-muted d-block small">Govt MSP Price</span>
+                            <span class="fw-bold text-success fs-6">{{ crop.msp_price }}</span>
+                        </div>
+                        <div class="col-6 ps-3">
+                            <span class="text-muted d-block small">Mandi Market Rate</span>
+                            <span class="fw-bold text-dark fs-6">{{ crop.market_rate }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

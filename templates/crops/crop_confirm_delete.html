@@ -1,0 +1,32 @@
+{% extends 'core/dashboard_base.html' %}
+{% block title %}Smart Farmer Assistant - Delete Crop{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <div class="row justify-content-center py-5">
+        <div class="col-md-8 col-lg-6">
+            <div class="premium-card p-4 p-md-5 border bg-white shadow-lg text-center">
+                <div class="card-icon-container mx-auto mb-4 bg-danger bg-opacity-10 text-danger" style="width: 70px; height: 70px; border-radius: 50%;">
+                    <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+                </div>
+
+                <h3 class="fw-bold mb-3 text-dark">Confirm Deletion</h3>
+                <p class="text-muted mb-4">Are you sure you want to permanently delete the crop record for <strong class="text-dark">{{ crop.get_name_display }} ({{ crop.variety }})</strong>?</p>
+                <p class="text-danger small mb-5"><i class="bi bi-info-circle me-1"></i> This action is irreversible. All recorded yields and financial projections for this crop will be erased.</p>
+
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a href="{% url 'crops:crop_detail' crop.pk %}" class="btn btn-outline-secondary px-4 py-2">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger px-4 py-2">
+                            Yes, Delete Permanently <i class="bi bi-trash3 ms-1"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

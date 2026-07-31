@@ -1,0 +1,240 @@
+{% extends 'core/dashboard_base.html' %}
+{% block title %}Smart Farmer Assistant - Crop Disease Prediction{% endblock %}
+
+{% block dashboard_content %}
+<div class="fade-in-up">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">🦠 Crop Disease Prediction (Machine Learning)</h2>
+            <p class="text-muted mb-0">Select an Indian crop and enter meteorological values to classify diseases using Decision Trees, Random Forests, or KNN models.</p>
+        </div>
+    </div>
+
+    <!-- Main Form and Results Area -->
+    <div class="row g-4 mb-5">
+        <!-- Input Form Column -->
+        <div class="col-lg-6">
+            <div class="p-4 p-md-5 rounded-4 bg-white border shadow-sm h-100">
+                <h4 class="fw-bold mb-4 text-dark"><i class="bi bi-sliders me-2 text-success"></i>Classification Inputs</h4>
+                
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.crop_name.id_for_label }}" class="form-label fw-semibold">Select Crop Name *</label>
+                        {{ form.crop_name }}
+                        {% for error in form.crop_name.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.temperature.id_for_label }}" class="form-label fw-semibold">Temperature (°C) *</label>
+                            {{ form.temperature }}
+                            {% for error in form.temperature.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.humidity.id_for_label }}" class="form-label fw-semibold">Relative Humidity (%) *</label>
+                            {{ form.humidity }}
+                            {% for error in form.humidity.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ form.rainfall.id_for_label }}" class="form-label fw-semibold">Rainfall (mm) *</label>
+                            {{ form.rainfall }}
+                            {% for error in form.rainfall.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.soil_type.id_for_label }}" class="form-label fw-semibold">Select Soil Type *</label>
+                            {{ form.soil_type }}
+                            {% for error in form.soil_type.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.ml_model.id_for_label }}" class="form-label fw-semibold text-success">Machine Learning Estimator Model *</label>
+                        {{ form.ml_model }}
+                        {% for error in form.ml_model.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="btn btn-premium w-100 py-3">
+                        Run Disease Classification <i class="bi bi-cpu ms-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ML Prediction Results Output -->
+        <div class="col-lg-6">
+            <div class="p-4 p-md-5 rounded-4 bg-white border shadow-sm h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h4 class="fw-bold mb-4 text-dark"><i class="bi bi-patch-question me-2 text-success"></i>Classifier Diagnosis</h4>
+                    
+                    {% if result %}
+                    <!-- Dynamic Diagnostic Visual Icon -->
+                    <div class="text-center mb-3">
+                        {% if result.disease == 'Healthy' %}
+                        <div class="d-inline-flex p-3 rounded-circle bg-success bg-opacity-10 text-success mb-2 shadow-sm">
+                            <i class="bi bi-shield-fill-check" style="font-size: 3.5rem; line-height: 1;"></i>
+                        </div>
+                        {% else %}
+                        <div class="d-inline-flex p-3 rounded-circle bg-danger bg-opacity-10 text-danger mb-2 shadow-sm">
+                            <i class="bi bi-exclamation-triangle-fill" style="font-size: 3.5rem; line-height: 1;"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="text-center py-2 mb-4 rounded-4 bg-light border">
+                        <span class="text-muted d-block small mb-1">PREDICTED CONDITION</span>
+                        <h3 class="fw-bold {% if result.disease == 'Healthy' %}text-success{% else %}text-danger{% endif %} mb-2">
+                            {{ result.disease }}
+                        </h3>
+                        
+                        <!-- Confidence Badge -->
+                        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 bg-white border rounded-pill shadow-sm">
+                            <span class="small text-muted">Confidence Score:</span>
+                            <span class="fw-bold text-success">{{ result.confidence }}%</span>
+                        </div>
+                    </div>
+
+                    <!-- Confidence Progress Bar -->
+                    <div class="mb-4">
+                        <div class="progress" style="height: 12px; border-radius: 6px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated {% if result.disease == 'Healthy' %}bg-success{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ result.confidence }}%;" aria-valuenow="{{ result.confidence }}" aria-valuemin="0" aria-valuemax="100">
+                                <span class="small fw-bold">{{ result.confidence }}%</span>
+                            </div>
+                        </div>
+                        <small class="text-muted mt-1 d-block text-end">Algorithm: {{ result.ml_model }}</small>
+                    </div>
+
+                    <!-- Recommended Treatment Section -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-clipboard-plus text-success me-2"></i>Recommended Treatment (Gujarat Zone)</h6>
+                        <p class="p-3 bg-success bg-opacity-10 text-success-emphasis border border-success border-opacity-15 rounded-3 mb-0" style="font-size: 0.95rem; line-height: 1.6;">
+                            {{ result.treatment }}
+                        </p>
+                    </div>
+
+                    <!-- Dynamic Prevention Tips Section -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-shield-plus text-success me-2"></i>Prevention & Cultural Practices</h6>
+                        <ul class="list-group list-group-flush border rounded-3 bg-light" style="font-size: 0.9rem;">
+                            {% for tip in result.prevention_tips %}
+                            <li class="list-group-item bg-transparent py-2"><i class="bi bi-dot text-success me-1 fs-5 align-middle"></i>{{ tip }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Download Report Placeholder Button -->
+                    <div class="mb-4">
+                        <a href="{% url 'crops:disease_prediction_pdf' result.id %}" class="btn btn-outline-success w-100 py-2">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> Download Diagnostic Report (PDF)
+                        </a>
+                    </div>
+
+                    <!-- Agriculture Expert Disclaimer -->
+                    <div class="alert alert-warning border-warning-subtle small mb-0 d-flex gap-2 align-items-center" style="border-radius: 12px;">
+                        <i class="bi bi-exclamation-circle-fill text-warning fs-5"></i>
+                        <span><strong>Disclaimer:</strong> This is an AI-based recommendation. Please consult an agriculture expert or local Krishi Vigyan Kendra before applying treatment.</span>
+                    </div>
+
+                    {% else %}
+                    <div class="text-center py-5 my-auto text-muted">
+                        <div class="card-icon-container mx-auto mb-4 bg-light text-secondary">
+                            <i class="bi bi-cpu fs-1"></i>
+                        </div>
+                        <h5>Diagnosis Report Pending</h5>
+                        <p class="small text-muted px-4">Enter environmental parameters (temperature, humidity, rainfall) for your crop to evaluate potential diseases using trained decision boundaries.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prediction History Log -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                <h4 class="fw-bold mb-4"><i class="bi bi-clock-history me-2 text-success"></i>Prediction Logs (SQLite Database)</h4>
+                
+                {% if history %}
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date/Time</th>
+                                <th>Crop Name</th>
+                                <th>Parameters Input</th>
+                                <th>Soil Type</th>
+                                <th>ML Model</th>
+                                <th>Predicted Disease</th>
+                                <th>Confidence</th>
+                                <th>Report</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in history %}
+                            <tr>
+                                <td class="small text-muted">{{ record.created_at|date:"d/m/Y H:i" }}</td>
+                                <td class="fw-bold text-success">
+                                    {{ record.get_crop_name_display }}
+                                </td>
+                                <td class="small">
+                                    <span class="badge bg-light text-dark">Temp: {{ record.temperature }}°C</span>
+                                    <span class="badge bg-light text-dark">Hum: {{ record.humidity }}%</span>
+                                    <span class="badge bg-light text-dark">Rain: {{ record.rainfall }}mm</span>
+                                </td>
+                                <td>{{ record.get_soil_type_display }}</td>
+                                <td><span class="badge bg-secondary bg-opacity-10 text-secondary">{{ record.ml_model }}</span></td>
+                                <td class="fw-bold {% if record.disease == 'Healthy' %}text-success{% else %}text-danger{% endif %}">
+                                    {{ record.disease }}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="fw-semibold text-success">{{ record.confidence }}%</span>
+                                        <div class="progress flex-grow-1" style="height: 5px; width: 60px; border-radius: 2px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ record.confidence }}%;"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="{% url 'crops:disease_prediction_pdf' record.id %}" class="btn btn-sm btn-outline-success py-0.5 px-2">
+                                        <i class="bi bi-file-earmark-pdf"></i> Download
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-database-exclamation fs-1 mb-2"></i>
+                    <p class="mb-0">No previous predictions recorded. Run a query above to log history.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Helper filter for dictionary lookup -->
+<script>
+    // We register a simple template filter or use template logic
+</script>
+{% endblock %}
