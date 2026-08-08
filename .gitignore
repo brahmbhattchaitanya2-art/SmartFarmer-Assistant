@@ -57,6 +57,8 @@ cover/
 # Django stuff:
 local_settings.py
 db.sqlite3
+old_data.json
+db_backup.sqlite3
 db.sqlite3-journal
 media/
 
