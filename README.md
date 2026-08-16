@@ -153,7 +153,7 @@ Features include:
 *Plotly* is used to create interactive market-price graphs.
 
 ### Basic Workflow
-
+```
 text
 APMC Market Data
        ↓
@@ -166,7 +166,7 @@ Average / High / Low
 Plotly Chart
        ↓
 Display to Farmer
-
+```
 
 This feature helps farmers understand recent commodity-price trends before making selling decisions.
 
@@ -189,7 +189,7 @@ The input features are processed and passed to trained Machine Learning models.
 Where supported, predict_proba() can be used to obtain class probabilities and display a confidence value.
 
 ### Machine Learning Workflow
-
+```
 text
 Environmental / Crop Data
           ↓
@@ -206,6 +206,7 @@ Disease Prediction
 Probability / Confidence
           ↓
 Final Result
+```
 
 
 This is the *traditional Machine Learning part* of SmartFarmer.
@@ -322,7 +323,7 @@ The final result can display:
 - Confidence percentage
 
 ### Easy Flow to Remember
-
+```
 text
 Leaf Photo
     ↓
@@ -343,7 +344,7 @@ Class / Disease Name
 Confidence %
     ↓
 Final Result
-
+```
 
 ---
 
@@ -544,7 +545,7 @@ The database stores application information such as crop and user-related record
 ---
 
 # 🏗️ Simplified System Architecture
-
+```
 text
                          SMARTFARMER
                               │
@@ -571,7 +572,7 @@ text
                                     │                 │
                               Numerical Data       Leaf Image
 
-
+```
 ---
 
 # 📁 Project Structure
@@ -683,7 +684,7 @@ This checks the Django project for common configuration problems.
 ---
 
 # 🔄 Complete SmartFarmer Flow
-
+```
 text
                            FARMER
                               │
@@ -709,7 +710,7 @@ text
       Fertilizer          PDF Reports       Farm Analytics
        Guidance
 
-
+```
 ---
 
 # 🎯 Project Objective
