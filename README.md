@@ -7,6 +7,14 @@ The project is mainly designed around farming conditions in *Gujarat, India, wit
 SmartFarmer combines traditional farm-management features with intelligent features such as *crop disease prediction, Deep Learning leaf scanning, weather-based farming advice, market-price analysis, fertilizer guidance, farming news, and PDF diagnostic reports*.
 
 ---
+### ▶️ Click the thumbnail below to watch the full demo on YouTube
+
+[![SmartFarmer Full Project Demo](assets/smartfarmer-demo-thumbnail.png)](https://youtu.be/QwVSuCP2hc0)
+
+
+
+
+
 
 # 🚀 Key Modules & Features
 
