@@ -114,7 +114,7 @@ Based on these environmental conditions, the application provides simple farming
 
 ### Basic Workflow
 
-
+```
 Weather API
      ↓
 Weather Data
@@ -126,7 +126,7 @@ Django Application
 Farming Advice
      ↓
 Display to Farmer
-
+```
 
 This helps the farmer consider current weather conditions before performing farming activities.
 
@@ -396,7 +396,7 @@ A report can contain information such as:
 
 ### Workflow
 
-text
+```
 Prediction Result
        ↓
 Diagnostic Information
@@ -406,7 +406,7 @@ ReportLab
 PDF Generation
        ↓
 Diagnostic Report
-
+```
 
 This allows prediction information to be stored or shared in a readable document format.
 
@@ -435,7 +435,7 @@ For example, different soil conditions may require adjustments to recommended fe
 
 ### Basic Workflow
 
-
+```
 Crop
   +
 Growth Stage
@@ -447,7 +447,7 @@ N-P-K Requirement
 Recommendation Rules
   ↓
 Fertilizer Guidance
-
+```
 
 ---
 
@@ -463,7 +463,7 @@ Technologies used:
 
 ### Workflow
 
-text
+```
 Public Web Source
        ↓
 HTTP Request
@@ -479,7 +479,7 @@ Extract Relevant News
 Remove Duplicates
        ↓
 Display News
-
+```
 
 *BeautifulSoup* is a Python library used for parsing HTML and extracting required information from webpages.
 
