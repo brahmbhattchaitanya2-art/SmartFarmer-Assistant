@@ -114,7 +114,7 @@ Based on these environmental conditions, the application provides simple farming
 
 ### Basic Workflow
 
-text
+
 Weather API
      ↓
 Weather Data
@@ -154,7 +154,7 @@ Features include:
 
 ### Basic Workflow
 ```
-text
+
 APMC Market Data
        ↓
 Pandas Processing
@@ -190,7 +190,7 @@ Where supported, predict_proba() can be used to obtain class probabilities and d
 
 ### Machine Learning Workflow
 ```
-text
+
 Environmental / Crop Data
           ↓
 Data Preprocessing
@@ -324,7 +324,7 @@ The final result can display:
 
 ### Easy Flow to Remember
 ```
-text
+
 Leaf Photo
     ↓
 RGB
@@ -435,7 +435,7 @@ For example, different soil conditions may require adjustments to recommended fe
 
 ### Basic Workflow
 
-text
+
 Crop
   +
 Growth Stage
@@ -546,7 +546,7 @@ The database stores application information such as crop and user-related record
 
 # 🏗️ Simplified System Architecture
 ```
-text
+
                          SMARTFARMER
                               │
               ┌───────────────┴───────────────┐
@@ -577,7 +577,7 @@ text
 
 # 📁 Project Structure
 
-text
+```
 SmartFarmer/
 │
 ├── core/
@@ -606,6 +606,7 @@ SmartFarmer/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+```
 
 
 > *Note:* The exact folder structure may vary depending on the current version of the project.
@@ -685,7 +686,7 @@ This checks the Django project for common configuration problems.
 
 # 🔄 Complete SmartFarmer Flow
 ```
-text
+
                            FARMER
                               │
                               ▼
