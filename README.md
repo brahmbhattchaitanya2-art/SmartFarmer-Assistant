@@ -19,6 +19,7 @@ SmartFarmer combines traditional farm-management features with intelligent featu
 # 🚀 Key Modules & Features
 
 ## 📊 1. Dashboard & Farm Analytics
+<img src="assets/dashboard-farm-analytics.png" width="850">
 
 The dashboard gives the farmer a quick overview of farming activities and crop information.
 
@@ -65,6 +66,7 @@ The system can also calculate crop progress according to the sowing date and est
 ---
 
 ## 📚 3. Crop Reference Library
+<img src="assets/crop-library.jpg" width="850">
 
 SmartFarmer contains a searchable reference library containing information about common Indian crops.
 
@@ -94,6 +96,7 @@ This module provides farmers with basic crop information in one place.
 ---
 
 ## ☁️ 4. Weather Information & Farming Advice
+<img src="assets/weather-updates.jpg" width="850">
 
 SmartFarmer retrieves weather information using a *weather API*.
 
@@ -133,6 +136,7 @@ This helps the farmer consider current weather conditions before performing farm
 ---
 
 # 📈 5. APMC / Mandi Market Price Analysis
+<img src="assets/market-prices.jpg" width="850">
 
 SmartFarmer provides agricultural commodity-price information using *APMC market data*.
 
@@ -214,6 +218,7 @@ This is the *traditional Machine Learning part* of SmartFarmer.
 ---
 
 # 🌿 7. Deep Learning Leaf Scanner
+<img src="assets/ai-leaf-scanner.jpg" width="850">
 
 SmartFarmer also contains a separate *Deep Learning Leaf Scanner*.
 
@@ -452,7 +457,7 @@ Fertilizer Guidance
 ---
 
 # 📰 10. Farming News Aggregator
-
+<img src="assets/farming-news.jpg" width="850">
 SmartFarmer contains a farming-news module that collects agriculture-related information from supported public web sources.
 
 Technologies used:
