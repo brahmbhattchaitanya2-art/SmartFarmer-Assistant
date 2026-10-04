@@ -66,7 +66,7 @@ The system can also calculate crop progress according to the sowing date and est
 ---
 
 ## 📚 3. Crop Reference Library
-<img src="assets/crop-library.jpg" width="850">
+<img src="assets/crop-library.png" width="850">
 
 SmartFarmer contains a searchable reference library containing information about common Indian crops.
 
@@ -96,7 +96,7 @@ This module provides farmers with basic crop information in one place.
 ---
 
 ## ☁️ 4. Weather Information & Farming Advice
-<img src="assets/weather-updates.jpg" width="850">
+<img src="assets/weather-updates.png" width="850">
 
 SmartFarmer retrieves weather information using a *weather API*.
 
@@ -136,7 +136,7 @@ This helps the farmer consider current weather conditions before performing farm
 ---
 
 # 📈 5. APMC / Mandi Market Price Analysis
-<img src="assets/market-prices.jpg" width="850">
+<img src="assets/market-prices.png" width="850">
 
 SmartFarmer provides agricultural commodity-price information using *APMC market data*.
 
